@@ -1,0 +1,1331 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<interface name="game_loadout">
+<include file="/ui/inc_button.xml"/>
+
+	<!-- Fonts -->
+	<include file="fonts.xml"/>
+	
+	<!-- Styles -->	
+	
+	<style name="lobby_window_header_bg" texture="/ui/frames/rounded_header_bg_white.tga" height="26" color="#2E1F00" borderthickness="12"/>
+	<style name="lobby_window_header" texture="/ui/frames/roundframe_header.tga" height="26" color="#5E2D1F" borderthickness="12"/>
+	<style name="lobby_window_header_label" width="-20" align="center" textvalign="center" font="chat_14" color="white" shadow="true"/>
+	<style name="lobby_window_bg" texture="/ui/frames/rounded_bg_white.tga" borderthickness="12" color="0 0 0 .5"/><!--color="#2E1F0055"/>-->
+	<style name="lobby_window" texture="/ui/frames/roundframe.tga" color="#5E2D1F" borderthickness="12"/>
+	<style name="lobby_window_footer_bg" valign="bottom" texture="/ui/frames/rounded_footer_bg_white.tga" height="35" color="#2E1F00" borderthickness="12"/>
+	<style name="lobby_window_footer" valign="bottom" texture="/ui/frames/roundframe_footer.tga" height="35" color="#5E2D1F" borderthickness="12"/>
+	<style name="ammo_label" height="100%" width="100%" font="gametiny" shadow="true" textalign="right" textvalign="bottom" color="white" ontrigger="If(param > 1, SetText(param), ClearText());"/>
+	
+	<include file="/ui/demo_nag.xml"/>
+	<include file="/ui/game_chat.xml"/>
+	
+	<!-- Templates -->
+	
+	<template name="header_button">	
+		<frame  x="0" style="lobby_window_bg"  height="26"   color=".8 .3 0 .4"   borderthickness="8"></frame> <!-- frame header bg -->
+		<frame  name="{tag}_hightlight" x="0" style="lobby_window_bg" height="26" color=".8 .3 0 1"  visible="0"   borderthickness="8"></frame> <!-- frame header bg -->
+		<frame  name="{tag}_lvlup" x="0" style="lobby_window_bg" height="26" color="{lvlup}"  visible="0"   borderthickness="8" watch="StatPoints" ontrigger="SetVisible(param);"></frame> <!-- frame header bg -->
+		<frame  x="0" texture="/ui/frames/roundframe.tga"  height="26" color="#863838" borderthickness="8"/>
+		<label  y="-4" align="center" valign="center" textvalign="center" textalign="center" height="26" font="chat_14" color="white" shadow="true">{label}</label>							
+		<button onmouseover="PlaySound('{sound=/shared/sounds/ui/tutorial/popup_show_4.mp3}'); showwidget('{tag}'); showwidget('{tag}_hightlight');" onmouseout="hidewidget('{tag}'); hidewidget('{tag}_hightlight');" color="invisible"/>
+		<panel noclick="false" y="-4" width="36" height="36" >
+			<frame  x="0" style="lobby_window_bg"  color="0 0 0 1"  borderthickness="8"></frame> <!-- frame header bg -->
+			<image width="32" height="32" align="center" valign="center" texture="{image}"/>
+			<frame  x="0" texture="/ui/frames/roundframe.tga"   color="#863838" borderthickness="8"/>			
+			<button onmouseover="PlaySound('{sound=/shared/sounds/ui/tutorial/popup_show_4.mp3}'); showwidget('{tag}'); showwidget('{tag}_hightlight');" onmouseout="hidewidget('{tag}'); hidewidget('{tag}_hightlight');" color="invisible"/>
+		</panel>
+	</template>	
+	
+	<template name="persistent_tip">
+		<panel name="persistent_{id}" group="persistent_group" visible="0">
+			<label y="10" width="100%" font="chat_16" color="yellow" shadow="true" textalign="center"  onshow="SetText(Persistant_Vault{id}_Name);">name</label>
+			<label y="30" width="90%" align="center" height="80" font="chat_12" color="white" shadow="true" wrap="true" textalign="center"  onshow="SetText(Persistant_Vault{id}_Description);">name</label>
+		</panel>
+	</template>
+	
+	
+	
+	<template name="unit_button">	
+		<panel width="90%" align="center" height="72" color="invisible">			
+			<frame texture="/ui/frames/rounded_bg_white.tga" color=".6 .3 0 .6" borderthickness="8"/>
+			<frame name="{unit}_button_over" texture="/ui/frames/rounded_bg_white.tga" color=".6 .3 0 1" borderthickness="8" visible="0"/>
+			<frame texture="/ui/frames/rounded_bg_white.tga" color=".3 .1 0 1" borderthickness="8" visible="0" watch="Entity"  ontrigger="SetVisible(StringEquals(*(param # '_Name'),'{unit3}'));"/>
+			<image x="4" valign="center" height="64" width="64" onshow="SetTexture(player_{codename}_iconpath);"/>
+			<panel width="-68" align="right" color="invisible">
+				<label  y="8" width="100%" font="chat_18" color="white" shadow="true" textalign="center" onshow="SetText(player_{codename}_name);"></label>
+				<label  y="30" width="100%" font="chat_16" color="yellow" shadow="true" textalign="center"  watch="LoadoutUnit{unit2}Cost" ontrigger="SetText('Cost: ' # param);">Cost: {cost}</label>
+				<label  y="52" width="100%" font="chat_12" color="cyan" shadow="true" textalign="center" watch="LoadoutUnit{unit2}InService" ontrigger="SetText('In Service: ' # param);">In Service:</label>
+			</panel>
+			<frame texture="/ui/frames/roundframe.tga"  color="#5E2D1F" borderthickness="8"/>
+			<frame texture="/ui/frames/roundframe.tga"  color="yellow" borderthickness="8" watch="Entity"  ontrigger="SetVisible(StringEquals(*(param # '_Name'),'{unit3}'));"/>
+			<button name="select{unit}" color="invisible" onmouseover="PlaySound('/shared/sounds/ui/button_over_small.mp3'); ShowWidget('{unit}_button_over'); SetPlayerDetailsTarget('{codename}');" onmouseout="stopsound(1); HideWidget('{unit}_button_over'); ClearPlayerDetailsTarget();"  onclick="Unit('{codename}'); PlaySound('{sound=/shared/sounds/ui/unit_select.mp3}'); HideWidget('{unit}_button_over'); ClearPlayerDetailsTarget(); PlayVoiceTip('/ui/vtip/units/{race}/{unit}.mp3');"/>
+		</panel>				
+	</template>	
+	
+	
+	
+	
+	<template name="unit_button_gray">	
+		<panel name="test" width="90%" align="center" height="72" color="invisible" watch="LoadoutUnit{unit2}Available" ontrigger="SetVisible(!param);">			
+			<frame texture="/ui/frames/rounded_bg_white.tga" borderthickness="8" color=".2 .2 .2 1"/>
+			<image x="4" valign="center" height="64" width="64" onshow="SetTexture(player_{codename}_iconpath);" rendermode="grayscale"/>
+			<panel width="-68" align="right" color="invisible">
+				<label  y="8" width="100%" font="chat_18" color="white" shadow="true" textalign="center" onshow="SetText(player_{codename}_name);"></label>
+				<label  y="30" width="100%" font="chat_16" color="yellow" shadow="true" textalign="center"  watch="LoadoutUnit{unit2}Cost" ontrigger="SetText('Cost: ' # param);">Cost: {cost}</label>
+				<label  y="52" width="100%" font="chat_12" color=".8 .8 .8 1" shadow="true" textalign="center">Not Researched</label>
+			</panel>
+			<frame texture="/ui/frames/roundframe.tga"  color="#5E2D1F" borderthickness="8"/>
+			<frame name="{unit}_button_over_gray" texture="/ui/frames/roundframe.tga"  color="1 1 1 .5" borderthickness="8" visible="0"/>
+			<button color="invisible" onmouseover="PlaySound('/shared/sounds/ui/button_over_small2.mp3'); showwidget('{unit}_button_over_gray'); SetPlayerDetailsTarget('{codename}');" onmouseout="HideWidget('{unit}_button_over_gray'); ClearPlayerDetailsTarget();"  onclick="PlaySound('{sound=/shared/sounds/ui/place_error.mp3}'); HideWidget('{unit}_button_over_gray'); ClearPlayerDetailsTarget();"/>
+		</panel>				
+	</template>
+	
+	
+	
+	
+	<template name="abilities">
+		<panel height="80"  color="invisible"  sticky="true" stickytoinvis="false" watch="InventoryIsAbility{index}" ontrigger="SetVisible(param); If(_curability gt _abilitystart + 2, SetVisible(false)); If(_curability lt _abilitystart, SetVisible(false)); If(param, Set(_curability, _curability + 1));">
+			<frame style="lobby_window_bg" texture="/ui/frames/rounded_bg_white.tga" color="0 0 0 .4" borderthickness="6" noclick="true"></frame>
+			<frame style="lobby_window"  texture="/ui/frames/roundframe.tga"  borderthickness="6" noclick="true"></frame>
+			<panel x="5" y="5" height="32" width="-10" > 
+				<image height="32" width="32" watch="InventoryEntity{index}" ontrigger="SetTexture(*(param # '_iconpath'));" texture="/ui/elements/empty_logo.tga"/>
+				<panel width="-32" color="invisible" align="right"> 
+					<label width="50%" x="4" height="12"  valign="top" align="left" textalign="left" font="chat_12" color="yellow" watch="InventoryName{index}" ontrigger="SetText(param);" shadow="true">Stone Bombardment</label>
+					
+					<label width="50%" x="40" y="2"  height="12"  valign="top" align="center" textalign="center" font="chat_10" color="yellow" watch="InventoryPrerequisite{index}" ontrigger="SetText('^wRequires:^* ' # param);" shadow="true">Requires: ^yArmory^*</label>
+					
+					<label width="50%" x="4" y="-5" align="left" textalign="left" valign="bottom" height="10"  font="chat_10" color="white" watch="InventoryType{index}" ontrigger="SetText('^yAbility Type:^* ' # param);" shadow="true">^yAbility Type:^* Melee Weapon</label>
+					<image align="right" x="-30" height="16" width="16" texture="/ui/elements/mana_icon.tga"/>
+					<label width="30" x="0" y="2" height="10"  valign="top" align="right" textalign="center" font="chat_10" color="cyan" watch="InventoryManaCost{index}" ontrigger="SetText(param);" shadow="true"></label>
+					<label width="50%" x="-4" y="-5" align="right" textalign="right" valign="bottom" height="10"  font="chat_10" color="white" watch="InventoryCooldown{index}" ontrigger="SetText('^yCooldown:^* ' # param);" shadow="true">^yCooldown:^* {cooldown}s</label>					
+				</panel>
+				<panel height="50" y="34" color="invisible" >
+					<label width="100%" x="4"  valign="top" align="left" textalign="left" font="chat_9" wrap="true" color="white" watch="InventoryDescription{index}" ontrigger="SetText(param);" shadow="true">lots of text yeahlots of text yeahlots of text yeahlots of text yeahlots of text yeahlots of text yeahlots of text yeahlots of text yeahlots of text yeahlots of text yeahlots of text yeahlots of text yeahlots of text yeah lots</label>
+				</panel>
+			</panel>
+		</panel>
+	</template>
+	
+	<template name="rangedammo">
+		<panel height="60"  color="invisible" sticky="true" stickytoinvis="false" watch="InventoryRangedAmmo{index}"> 
+			<frame style="lobby_window_bg" texture="/ui/frames/rounded_bg_white.tga"  color="0 0 0 .4" borderthickness="6" noclick="true"></frame>
+			<frame style="lobby_window"  texture="/ui/frames/roundframe.tga"  borderthickness="6" noclick="true"></frame>
+			<panel x="5"  height="48" width="-10"  color="invisible" valign="center"> 
+				<image height="42" width="42" valign="center" watch="InventoryEntity{index}" ontrigger="SetTexture(*(param # '_iconpath'));" texture="/ui/elements/empty_logo.tga"/>
+				 
+				<panel width="-46" color="invisible" align="right"> 
+					<label width="50%" x="4" height="12"  valign="top" align="left" textalign="left" font="chat_12" color="yellow" watch="InventoryName{index}" ontrigger="SetText(param);" shadow="true">Repeater</label>
+					<label width="50%" x="4" y="18" height="12"  valign="top" align="left" textalign="left" font="chat_10" color="white" watch="InventoryType{index}" ontrigger="SetText('^yAbility Type:^* ' # param);" shadow="true">Repeater</label>
+					<label width="50%" x="4" y="-5" align="left" textalign="left" valign="bottom" height="10"  font="chat_10" color="white"  watch="InventoryPrerequisite{index}" ontrigger="SetText('^wRequires:^* ' # param);" shadow="true">^yRequires:^* Armory</label>
+					
+					<label width="50%" x="-4" y="2" height="10"  valign="top" align="right" textalign="right" font="chat_10" color="cyan"  watch="InventoryRangedDamage{index}" ontrigger="SetText('Damage: ' # param);" shadow="true">Damage: 120-300</label>
+					<label width="50%" x="-4" y="-5" align="right" textalign="right" valign="bottom" height="10"  font="chat_10" color="white" watch="InventoryAmmo{index}" ontrigger="SetText('^yAmmo:^* ' # param);" shadow="true">^yAmmo:^* 30</label>					
+				</panel>
+			</panel>
+		</panel>
+	</template>	
+	
+	<template name="rangedmana">
+		<panel height="60"  color="invisible" sticky="true" stickytoinvis="false" watch="InventoryRangedMana{index}"> 
+			<frame style="lobby_window_bg" texture="/ui/frames/rounded_bg_white.tga"  color="0 0 0 .4" borderthickness="6" noclick="true"></frame>
+			<frame style="lobby_window"  texture="/ui/frames/roundframe.tga"  borderthickness="6" noclick="true"></frame>
+			<panel x="5"  height="48" width="-10" color="invisible" valign="center"> 
+				<image height="42" width="42"  valign="center" watch="InventoryEntity{index}" ontrigger="SetTexture(*(param # '_iconpath'));" texture="/ui/elements/empty_logo.tga"/>
+				<panel width="-46" color="invisible" align="right"> 
+					<label width="50%" x="4" height="12"  valign="top" align="left" textalign="left" font="chat_12" color="yellow" watch="InventoryName{index}" ontrigger="SetText(param);" shadow="true">Repeater</label>
+					<label width="50%" x="4" y="18" height="12"  valign="top" align="left" textalign="left" font="chat_10" color="white" watch="InventoryType{index}" ontrigger="SetText('^yAbility Type:^* ' # param);" shadow="true">Repeater</label>
+					<label width="50%" x="4" y="-5" align="left" textalign="left" valign="bottom" height="10"  font="chat_10" color="white" watch="InventoryPrerequisite{index}" ontrigger="SetText('^wRequires:^* ' # param);" shadow="true">^yRequires:^* Armory</label>
+					
+					<label width="50%" x="-4" y="2" height="10"  valign="top" align="right" textalign="right" font="chat_10" color="cyan" shadow="true">Damage: 120-300</label>
+					
+
+					<image align="right" x="-30" y="1" valign="bottom" height="16" width="16" texture="/ui/elements/mana_icon.tga"/>
+					<label width="30" x="0" y="-5" valign="bottom" height="10"   align="right" textalign="center" font="chat_10" color="cyan" watch="InventoryManaCost{index}" ontrigger="SetText(param);" shadow="true"></label>					
+				</panel>
+			</panel>
+		</panel>
+	</template>		
+	
+	
+	<template name="melee">
+		<panel height="60"  color="invisible" sticky="true" stickytoinvis="false" watch="InventoryMelee{index}"> 
+			<frame style="lobby_window_bg" texture="/ui/frames/rounded_bg_white.tga"  color="0 0 0 .4" borderthickness="6" noclick="true"></frame>
+			<frame style="lobby_window"  texture="/ui/frames/roundframe.tga"  borderthickness="6" noclick="true"></frame>
+			<panel x="5"  height="48" width="-10" color="invisible" valign="center"> 
+				<image height="42" valign="center" width="42" watch="InventoryEntity{index}" ontrigger="SetTexture(*(param # '_iconpath'));" texture="/ui/elements/empty_logo.tga"/>
+				<panel width="-46" color="invisible" align="right"> 
+					<label width="50%" x="4" height="12"  valign="top" align="left" textalign="left" font="chat_12" color="yellow"  watch="InventoryName{index}" ontrigger="SetText(param);" shadow="true">Battle Axe</label>
+					<label width="50%" x="4" y="18" height="12"  valign="top" align="left" textalign="left" font="chat_10" color="white" watch="InventoryType{index}" ontrigger="SetText(param);" shadow="true">Repeater</label>
+					<label width="50%" x="4" y="-5" align="left" textalign="left" valign="bottom" height="10"  font="chat_10" color="white" watch="InventoryPrerequisite{index}" ontrigger="SetText('^wRequires:^* ' # param);" shadow="true"></label>
+					
+					<label width="50%" x="-52" y="-4" height="10"  valign="top" align="right" textalign="right" font="chat_10" color="white"  shadow="true">^yQuick Atk Dmg:^*</label>
+					<label width="50%" x="-52" y="8" height="10"  valign="top" align="right" textalign="right" font="chat_10" color="white" shadow="true">^yQuick Atk Speed:^*</label>
+					
+					<label width="54" x="0" y="-4" height="10"  valign="top" align="right" textalign="center" font="chat_10" color="white" watch="InventoryQuickAttackDamage{index}" ontrigger="SetText(param);" shadow="true"></label>
+					<label width="54" x="0" y="8" height="10"  valign="top" align="right" textalign="center" font="chat_10" color="white" watch="InventoryQuickAttackSpeed{index}" ontrigger="SetText(param #' ms');" shadow="true"></label>					
+									
+				</panel>
+			</panel>
+		</panel>
+	</template>
+
+	
+	<template name="player_stat2">
+		<panel width="300" height="85" noclick="1">
+			<frame style="lobby_window_bg" texture="/ui/frames/rounded_bg_white.tga" color="#00000077" borderthickness="12"  noclick="1"></frame>
+			<frame style="lobby_window"  texture="/ui/frames/roundframe.tga"  borderthickness="12"  noclick="1"></frame>
+			<panel float="right" x="8" y="5" padding="3" noclick="1">
+				<frame width="90" height="24" valign="top" borderthickness="8" texture="/ui/frames/inset_round.tga" color="black" noclick="1">
+					<label x="4"  textvalign="center" textalign="Left" font="chat_12" watch="StatName{index}" ontrigger="SetText(param);" color="white" noclick="1"/>
+				</frame>
+				<frame width="50" height="24" valign="top" borderthickness="8" texture="/ui/frames/inset_round.tga" color="black" noclick="1">
+					<label y="4" textalign="center" font="chat_12" watch="StatPercent{index}" ontrigger="SetText(FtoP(param, 2) # '%');" color="white" noclick="1"/>
+				</frame>
+				<frame width="33" height="24" valign="top" borderthickness="8" texture="/ui/frames/inset_round.tga" color="black" noclick="1">
+					<label y="4" textalign="center" font="chat_12" watch="StatCost{index}" ontrigger="SetText(param);" color="white" noclick="1"/>
+				</frame>
+				<frame width="27" height="24" valign="top" borderthickness="8" texture="/ui/frames/inset_round.tga" color="black" noclick="1">
+					<label y="4" textalign="center" font="chat_12" watch="StatLevel{index}" ontrigger="SetText(param);" color="white" noclick="1"/>
+				</frame>
+				<button width="24" height="24" valign="top" name="StatButton{index}" align="center" watch="StatButton{index}" ontrigger="EnableWidget(param);" onclick="SpendPoint({index});" onmouseover="showwidget('tools'); showwidget('tools_hightlight'); " textureflags="udox" texture="/ui/elements/plus_button.tga"/>
+				<frame width="45" height="24" valign="center" borderthickness="8" texture="/ui/frames/inset_round.tga" color="black" noclick="1">
+					<label y="4" textalign="center" font="chat_12" watch="StatEffect{index}" ontrigger="SetText('+' # param # '%%');" color="white" noclick="1"/>
+				</frame>
+			</panel>
+			<label x="5" y="-3" width="290" height="51" valign="bottom" textalign="center" font="chat_10" wrap="true" shadow="true" color="white" noclick="1">{desc}</label>
+		</panel>
+		<image height="2" width="295" rendermode="overlay" texture="/ui/elements/line_break_inset.tga" noclick="true"/>
+		<panel height="2" width="295" color="invisible" noclick="true"/>
+	</template>	
+	
+	
+	<template name="player_stat3">
+		<panel width="300" height="85">
+			<frame style="lobby_window_bg" texture="/ui/frames/rounded_bg_white.tga" color="#00000077" borderthickness="12" noclick="true"></frame>
+			<frame style="lobby_window"  texture="/ui/frames/roundframe.tga"  borderthickness="12" noclick="true"></frame>
+			<panel float="right" x="8" y="5" padding="3" noclick="1">
+				<frame width="90" height="24" valign="top" borderthickness="8" texture="/ui/frames/inset_round.tga" color="black">
+					<label x="4"  textvalign="center" textalign="Left" font="chat_12" watch="StatName{index}" ontrigger="SetText(param);" color="white"/>
+				</frame>
+				<frame width="50" height="24" valign="top" borderthickness="8" texture="/ui/frames/inset_round.tga" color="black">
+					<label y="4" textalign="center" font="chat_12" watch="StatPercent{index}" ontrigger="SetText(FtoP(param, 2) # '%');" color="white"/>
+				</frame>
+				<frame width="33" height="24" valign="top" borderthickness="8" texture="/ui/frames/inset_round.tga" color="black">
+					<label y="4" textalign="center" font="chat_12" watch="StatCost{index}" ontrigger="SetText(param);" color="white"/>
+				</frame>
+				<frame width="27" height="24" valign="top" borderthickness="8" texture="/ui/frames/inset_round.tga" color="black">
+					<label y="4" textalign="center" font="chat_12" watch="StatLevel{index}" ontrigger="SetText(param);" color="white"/>
+				</frame>
+				<button width="24" height="24" valign="top" name="StatButton{index}" align="center" watch="StatButton{index}" ontrigger="EnableWidget(param);" onclick="SpendPoint({index});" textureflags="udox" texture="/ui/elements/plus_button.tga"/>
+				<frame width="45" height="24" valign="center" borderthickness="8" texture="/ui/frames/inset_round.tga" color="black">
+					<label y="4" textalign="center" font="chat_12" watch="StatEffect{index}" ontrigger="SetText('+' # param # '%%');" color="white"/>
+				</frame>
+			</panel>
+			<label x="5" y="-3" width="290" height="51" valign="bottom" textalign="center" font="chat_10" wrap="true" shadow="true" color="white">{desc}</label>
+		</panel>
+		<image height="2" width="295" rendermode="overlay" texture="/ui/elements/line_break_inset.tga"/>
+		<panel height="2" width="295" color="invisible"/>
+	</template>
+	
+	
+	
+	<template name="persistant_vault_slot">
+		<button width="64" height="64" valign="center" onmouseover="PlaySound('/shared/sounds/ui/button_over_small.mp3'); showwidget('persistent_{slot}'); showwidget('persistent_vault'); Set('_cur_loadout_item', {slot}); Exec('/ui/scripts/loadout_persistant_tooltip.cfg'); HideWidget('loadout_chat_panel');" onmouseout="hidewidget('persistent_{slot}'); hidewidget('persistent_vault'); HideWidget('loadout_item_tooltip'); ShowWidget('loadout_chat_panel');" onclick="PlaySound('/shared/sounds/ui/gold.mp3'); PurchasePersistant({slot}); showwidget('persistent_{slot}');">
+			<image name="PersistantVault{slot}" texture="/ui/elements/vault2.tga" watch="PersistantVaultIcon{slot}" ontrigger="SetTexture(param);"/>
+		</button>
+	</template>
+	
+	
+	<template name="backpack_slot_snap">
+		<snaptarget width="64" height="64" y="{yoffset}" x="{xoffset}" onsnap="SwapInventory({slot}, *(param # '_Slot')); ClearSnapTarget();" color="invisible" noclick="true"/>
+	</template>
+	
+	<template name="backpack_slot">
+		<panel width="64" height="64" y="{yoffset}" x="{xoffset}">
+			<image texture="/ui/elements/empty_pack.tga"/>
+			<panel
+				name="inventory_panel_{slot}"
+				cangrab="true"
+				onload="CreateInt(name # '_X'); CreateInt(name # '_Y'); CreateInt('_target_x'); CreateInt('_target_y'); CreateInt(name # '_Slot', {slot});"
+				onstartdrag="Set(name # '_X', param0); Set(name # '_Y', param1);"
+				onenddrag="
+					Set('_target_x', inventory_panel_{slot}_X);
+					Set('_target_y', inventory_panel_{slot}_Y);
+					If(param0 == _target_x and param1 == _target_y, Split(Sell({slot}, 1), PlaySound('/shared/sounds/ui/sell.mp3')));
+					SetAbsoluteX(_target_x);
+					SetAbsoluteY(_target_y);"
+				watch0="InventoryExists{slot}"
+				ontrigger0="SetVisible(param);"
+			>
+				<image texture="/ui/elements/empty_pack.tga" watch1="InventoryIcon{slot}" ontrigger1="SetTexture(param);" noclick="true"/>
+				<label name="Backpack{slot}Uses" style="ammo_label" watch="InventoryAmmoCount{slot}" noclick="true"/>
+			</panel>
+		</panel>
+	</template>	
+	
+	
+	<template name="free_itemSlotLock">
+		<panel width="64" height="64" y="{yoffset}" x="{xoffset}">
+			<image texture="/ui/elements/empty_pack.tga"/>
+			<panel
+				name="inventory_panel_{slot}"
+				cangrab="true"
+				onload="CreateInt(name # '_X'); CreateInt(name # '_Y'); CreateInt('_target_x'); CreateInt('_target_y'); CreateInt(name # '_Slot', {slot});"
+				onstartdrag="Set(name # '_X', param0); Set(name # '_Y', param1);"
+				onenddrag="
+					Set('_target_x', inventory_panel_{slot}_X);
+					Set('_target_y', inventory_panel_{slot}_Y);
+					If(param0 == _target_x and param1 == _target_y, Split(Sell({slot}, 1), PlaySound('/shared/sounds/ui/sell.mp3')));
+					SetAbsoluteX(_target_x);
+					SetAbsoluteY(_target_y);"
+				watch0="InventoryExists{slot}"
+				ontrigger0="SetVisible(param);"
+			>
+				<image texture="/ui/elements/empty_pack.tga" watch1="InventoryIcon{slot}" ontrigger1="SetTexture(param);" noclick="true"/>
+				<label name="Backpack{slot}Uses" style="ammo_label" watch="InventoryAmmoCount{slot}" noclick="true"/>
+			</panel>
+		</panel>
+		<panel width="64" height="64" y="{yoffset}" x="{xoffset}" watch="DemoAccount" ontrigger="SetVisible(param);">
+			<image texture="/ui/elements/empty_pack.tga" color="1 1 1 1"/>
+			<image texture="/ui/elements/lock.tga" color="1 1 1 .7"/>
+			<button name="upgradeitem" width="100%" height="100%" onclick="TogglePurchase();" onmouseover="ShowWidget('free_account_inventory'); PlaySound('/shared/sounds/ui/button_over_small2.mp3');" onmouseout="HideWidget('free_account_inventory');" color="0 0 0 0"/>
+		</panel>
+	</template>	
+	
+	<template name="consumable_item_slot">
+		<panel width="48" height="48">
+			<button
+				watch="ConsumableItemName{slot}"
+				onmouseover="showwidget('item_store');"			
+				ontrigger="if(StringLength(param) > 0, Split(
+					SetOnclick('PlaySound(\'/shared/sounds/ui/gold.mp3\'); Purchase(\'' # param # '\');'),
+					SetOnmouseover('
+						PlaySound(\'/shared/sounds/ui/button_over_small.mp3\');
+						Call(\'loadout_item_tooltip_name\', \'SetText(*(\\\'' # param # '_Name\\\'));\');
+						Call(\'loadout_item_tooltip_cost\', \'SetText(*(\\\'' # param # '_Cost\\\'));\');
+						Call(\'loadout_item_tooltip_description\', \'SetText(*(\\\'' # param # '_Description\\\'));\'):
+						Call(\'loadout_item_tooltip_prerequisite\', \'SetText(GetPrereqDetails(*(\\\'' # param # '_Prerequisite\\\')));\'):
+						ShowWidget(\'item_store\');
+						showwidget(\'item_store_hightlight\');
+						ShowWidget(\'loadout_item_tooltip_costheader\');
+						ShowWidget(\'loadout_item_tooltip_prerequisite\');
+						ShowWidget(\'loadout_item_tooltip_prerequisiteheader\');
+						ShowWidget(\'loadout_item_tooltip_cost\');
+						ShowWidget(\'loadout_item_tooltip\');
+						HideWidget(\'loadout_chat_panel\');')),
+					Split(SetOnmouseover('showwidget(\'item_store\');'), SetOnclick('')));"
+				onmouseout="HideWidget('loadout_item_tooltip'); hidewidget('item_store_hightlight'); ShowWidget('loadout_chat_panel');"
+
+
+			>
+				<image texture="/ui/elements/empty_pack.tga"
+
+					watch="ConsumableItemIcon{slot}"				
+					ontrigger="SetTexture(param);"
+					watch0="ConsumableItemAvailable{slot}"
+					ontrigger0="if(param, SetColor(1, 1, 1), SetColor(1, 0.1, 0.1));"
+
+
+				/>
+			</button>
+
+			<piegraph blockinput="false" noclick="true" onmouseover="showwidget('item_store');" onmouseout="HideWidget('loadout_item_tooltip'); hidewidget('item_store_hightlight'); ShowWidget('loadout_chat_panel');" start="270" end="-90" square="true" color="#000000cc" watch="ConsumableItemCooldown{slot}" ontrigger="SetValue(param);"/>
+		</panel>
+	</template>	
+	
+	
+	<panel name="voicetip" color="invisible" blockinput="false" noclick="true" onshow="PlayVoiceTip('/ui/vtip/states/loadout.mp3');"/>
+	
+		<!-- Main panel -->
+	
+		
+	<panel  texture="/ui/elements/parchment.tga"/>
+	<panel  texture="/ui/elements/score_grad.tga"/>
+	
+	<panel align="center" valign="center" width="1024" height="768" color="invisible">
+		<image texture="/ui/elements/shrine_back_2.tga" />
+		<frame texture="/ui/frames/rounded_bg_white.tga" borderthickness="8" style="lobby_window_bg"/>
+		<frame texture="/ui/frames/roundframe.tga"  color="#5E2D1F" borderthickness="8"/>
+
+
+		<!-- LEFT COLUMN-->
+		<panel name="leftcolumn" color="invisible" width="25%">						
+			<panel height="84%" y="10" width="96%" align="right"  valign="top" color="invisible">	
+				<image texture="/ui/elements/shrine_back_1.tga" />
+				<frame texture="/ui/frames/rounded_bg_white.tga" borderthickness="8" color="0 0 0 .3"/>
+				<frame texture="/ui/frames/roundframe.tga"  color="#5E2D1F" borderthickness="8"/>
+				
+				<panel y="15" >
+
+					<panel width="90%" align="center" height="48" color="invisible">
+						<frame texture="/ui/frames/rounded_bg_white.tga" borderthickness="8" style="lobby_window_bg"/>
+						<frame texture="/ui/frames/roundframe.tga"  color="#5E2D1F" borderthickness="8"/>	
+						<label y="8%" width="100%" font="chat_16" color="white" shadow="true" textalign="center">Choose A Unit</label>		
+						<label y="44%" width="100%" font="chat_18" color="yellow" shadow="true" watch="Gold" ontrigger="SetText('Your Gold: ' # FtoA(param, 0, 0, ','));" textalign="center">Your Gold: param</label>							
+					</panel>
+					
+					<!-- -->
+					<panel y="58" float="bottom" padding="2" watch="Race" ontrigger="SetVisible(StringEquals(param,'human'));">					
+						<instance name="unit_button" race="human" codename="engineer" unit="builder" unit2="Builder" unit3="Builder"/>
+						<instance name="unit_button" race="human" codename="marksman" unit="scout" unit2="Scout" unit3="Marksman"/>
+						<instance name="unit_button" race="human" codename="savage" unit="savage" unit2="Savage" unit3="Savage"/>
+						<instance name="unit_button" race="human" codename="legionnaire" unit="legionnaire" unit2="Legionnaire" unit3="Legionnaire"/>
+						<instance name="unit_button" race="human" codename="chaplain"  unit="chaplain" unit2="Chaplain" unit3="Chaplain"/>
+						<instance name="unit_button" race="human" codename="batteringram" unit="batteringram" unit2="Batteringram" unit3="Battering Ram"/>
+						<instance name="unit_button" race="human" codename="steambuchet" unit="steambuchet" unit2="Steambuchet" unit3="Steambuchet"/>	
+
+						<panel width="220" height="46">
+							<instance
+								align="center"
+								name="round_button2"							
+								width="220" height="46"
+								font="chat_12"
+								label="Take Command"
+								watch="HasCommander LobbyPhase LoadoutTime"
+								ontrigger="SetVisible(!HasCommander and LobbyPhase == 5); SetEnabled(LoadoutTime == 0 and !WasImpeached());"
+								onclick="RequestCommand();"
+								onmouseover="if(IsDemoAccount(), ShowWidget('demo_attribute_tip'));"
+								onmouseout="HideWidget('demo_attribute_tip');"
+							/>
+						</panel>
+					</panel>					
+					
+					
+					<!-- GRAYED OUT GOES ON TOP OF OTHERS BLOCKING CLICKES -->
+					<panel y="58" float="bottom" padding="2" noclick="true" watch="Race" ontrigger="SetVisible(StringEquals(param,'human'));">				
+						<instance name="unit_button_gray" race="human" codename="engineer" unit="builder" unit2="Builder"  unit3="Builder"/>
+						<instance name="unit_button_gray" race="human" codename="marksman" unit="scout" unit2="Scout" unit3="Marksman"/>
+						<instance name="unit_button_gray" race="human" codename="savage" unit="savage" unit2="Savage"  unit3="Savage"/>
+						<instance name="unit_button_gray" race="human" codename="legionnaire" unit="legionnaire" unit2="Legionnaire"  unit3="Legionnaire"/>
+						<instance name="unit_button_gray" race="human" codename="chaplain"  unit="chaplain" unit2="Chaplain"  unit3="Chaplain"/>
+						<instance name="unit_button_gray" race="human" codename="batteringram" unit="batteringram" unit2="Batteringram"  unit3="Battering Ram"/>
+						<instance name="unit_button_gray" race="human" codename="steambuchet" unit="steambuchet" unit2="Steambuchet"  unit3="Steambuchet"/>											
+					</panel>
+					
+					
+
+					<!-- -->
+					<panel y="58" float="bottom" padding="2" watch="Race" ontrigger="SetVisible(StringEquals(param,'beast'));">				
+						<instance name="unit_button" race="beast" codename="conjurer" unit="conjurer" unit2="Conjurer" unit3="Conjurer"/>
+						<instance name="unit_button" race="beast" codename="shapeshifter" unit="shapeshifter" unit2="Shapeshifter" unit3="Shape Shifter"/>
+						<instance name="unit_button" race="beast" codename="hunter" unit="hunter" unit2="Hunter" unit3="Hunter"/>
+						<instance name="unit_button" race="beast" codename="predator" unit="predator" unit2="Predator" unit3="Predator"/>
+						<instance name="unit_button" race="beast" codename="shaman"  unit="shaman" unit2="Shaman" unit3="Shaman"/>
+						<instance name="unit_button" race="beast" codename="behemoth" unit="behemoth" unit2="Behemoth" unit3="Behemoth"/>
+						<instance name="unit_button" race="beast" codename="tempest" unit="tempest" unit2="Tempest" unit3="Tempest"/>	
+
+						<instance
+							align="center"
+							name="round_button2"							
+							width="220" height="46"
+							font="chat_12"
+							label="Take Command"
+							watch="HasCommander LobbyPhase LoadoutTime"
+							ontrigger="SetVisible(!HasCommander and LobbyPhase == 5); SetEnabled(LoadoutTime == 0);"
+							onclick="RequestCommand();"
+							onmouseover="if(IsDemoAccount(), ShowWidget('demo_attribute_tip'));"
+							onmouseout="HideWidget('demo_attribute_tip');"
+						/>						
+					</panel>					
+					
+					
+					<!-- GRAYED OUT GOES ON TOP OF OTHERS BLOCKING CLICKES -->
+					<panel y="58" float="bottom" padding="2" noclick="true" watch="Race" ontrigger="SetVisible(StringEquals(param,'beast'));">				
+						<instance name="unit_button_gray" race="beast" codename="conjurer" unit="conjurer" unit2="Conjurer" unit3="Conjurer"/>
+						<instance name="unit_button_gray" race="beast" codename="shapeshifter" unit="shapeshifter" unit2="Shapeshifter" unit3="Shape Shifter"/>
+						<instance name="unit_button_gray" race="beast" codename="hunter" unit="hunter" unit2="Hunter" unit3="Hunter"/>
+						<instance name="unit_button_gray" race="beast" codename="predator" unit="predator" unit2="Predator" unit3="Predator"/>
+						<instance name="unit_button_gray" race="beast" codename="shaman"  unit="shaman" unit2="Shaman" unit3="Shaman"/>
+						<instance name="unit_button_gray" race="beast" codename="behemoth" unit="behemoth" unit2="Behemoth" unit3="Behemoth"/>
+						<instance name="unit_button_gray" race="beast" codename="tempest" unit="tempest" unit2="Tempest" unit3="Tempest"/>											
+					</panel>					
+					
+					
+				</panel>	
+
+				
+				
+			</panel>
+		</panel>
+		<!-- END LEFT COLUMN-->
+		
+		
+		<!--RIGHT COLUMN-->
+		<panel name="rightcolumn" align="right"  width="74%" color="invisible" float="bottom" padding="0">			
+			
+			<!-- TOP HALF -->
+			<panel y="31" color="invisible" height="285">
+				<panel name="minimap" y="10" x="-11"  align="right" color="green" height="192" width="192">
+					<frame  color=".8 .5 .3 1" visible="1" borderwidth="2" texture="/ui/frames/inset.tga"/>
+					<image valign="center" align="center" name="minimap_loadout_backer" width="188" height="188" texture="/ui/elements/empty_logo.tga"/>
+					<minimap valign="center" align="center" name="minimap_loadout" width="188" height="188" texture="!minimap_texture" watch="Minimap" />
+				</panel>
+				
+				<panel y="208" x="-11"  align="right" color="invisible" height="72" width="192">
+					<frame texture="/ui/frames/rounded_bg_white.tga" borderthickness="8" style="lobby_window_bg"/>
+					<frame texture="/ui/frames/roundframe.tga"  color="#5E2D1F" borderthickness="8"/>
+					<label y="5" width="100%" font="chat_12" color="yellow" shadow="true" textalign="center" watch="TeamGold" ontrigger="SetText('Team Gold: ' # FtoA(param, 0, 0, ','));">Team Gold: 2500</label>	
+					<label y="25" width="100%" font="chat_12" color="white" shadow="true" textalign="center">Stronghold Health</label>
+					<panel align="center" y="46"  width="90%" height="18" color="green">
+						<frame  color="white" visible="1" texture="/ui/frames/inset.tga" watch="CommSelectionHealthValue" >
+							<panel width="-4" height="-4" align="center" valign="center">	
+								<image texture="/ui/elements/health_neg.tga"/>
+								<image width="80%" texture="/ui/elements/health_pos_r.tga" watch="CommandCenterHealthPercent" ontrigger="SetWidth(FtoP(param));" />
+								<image width="80%" texture="/ui/elements/health_pos_y.tga" watch="CommandCenterHealthPercent" ontrigger="SetWidth(FtoP(param)); setcolor(1, 1, 1, saturate((param * 2.5) - 0.25));" />
+								<image width="80%" texture="/ui/elements/health_pos.tga" watch="CommandCenterHealthPercent" ontrigger="SetWidth(FtoP(param)); setcolor( 1, 1, 1, saturate((param * 2) - 1));" />
+
+								<image x="80%" width="2" color="white" watch="CommandCenterHealthPercent" ontrigger="SetX(FtoP(param));" />
+								<label y="0" height="100%" width="100%" textalign="center" font="chat_10" shadow="true" watch="ScoreboardCommandCenterHealthValue0 ScoreboardCommandCenterHealthMax0" ontrigger="SetText(Round(ScoreboardCommandCenterHealthValue0) # '/' # Round(ScoreboardCommandCenterHealthMax0));" color="white"/>
+							</panel>
+						</frame>					
+					</panel>
+				</panel>
+			
+				<panel width="-200" color="invisible">
+							
+					<panel y="10" valign="top" align="center" width="96%" height="128">					
+						<panel color="invisible">	
+							<frame texture="/ui/frames/rounded_bg_white.tga" borderthickness="8" style="lobby_window_bg"/>
+							<frame texture="/ui/frames/roundframe.tga"  color="#5E2D1F" borderthickness="8"/>
+						</panel>
+						<label width="-148" y="5" x="-30" font="chat_18" align="right" color="yellow" shadow="true" textalign="center" watch="Entity" ontrigger="SetText(*(param # '_name'));">Choose A Unit</label>
+						<panel x="-16" y="-10" height="70%" valign="bottom" align="right" width="-148" color="invisible">
+							<label y="5" width="100%" height="100%" font="chat_11" color="white" wrap="true" shadow="true" textalign="center" watch="PlayerDescription" ontrigger="SetText(param);"></label>
+						</panel>
+						<panel watch="Entity" ontrigger="SetVisible(!StringEquals(Entity,'Player_Observer'));">
+							<image x="10" y="-10"  width="128" height="128" watch="Entity" ontrigger="SetTexture(*(param # '_CommanderPortraitPath'));" texture="/hellbourne/units/devourer/com_portrait.tga"/>
+						</panel>
+						
+						<panel color="invisible" width="80%" height="70%" align="center" valign="center"  watch="Entity" ontrigger="SetVisible(StringEquals(Entity,'Player_Observer'));" >
+							<frame texture="/ui/frames/rounded_bg_white.tga" borderthickness="8" style="lobby_window_bg"/>
+							<frame texture="/ui/frames/roundframe.tga"  color="#5E2D1F" borderthickness="8"/>
+							<label  align="center" valign="center" textvalign="center" textalign="center" height="20" font="chat_16" color="white" shadow="true">Choose A Unit From The Left</label>
+						</panel>
+					</panel>
+								
+						<panel width="96%" align="center" name="_vitals" y="140" > <!--watch="Entity" ontrigger="SetVisible(!StringEquals(Entity,'Player_Observer'));"-->
+							<panel height="20">
+								<frame  x="0" style="lobby_window_header_bg" height="100%" texture="/ui/frames/rounded_header_bg_white.tga"   borderthickness="8"></frame> <!-- frame header bg -->
+								<frame  x="0" texture="/ui/frames/roundframe_header.tga"  color="#863838" borderthickness="8">
+									<label x="7" align="left" valign="center" textvalign="center" height="20" font="chat_12" color="white" shadow="true">Current Vitals</label>
+									<label x="-7" textalign="right" valign="center" textvalign="center" height="20" width="100%" font="chat_12" color="yellow" shadow="true" watch="BaseSpeed" ontrigger="SetText('Move speed: ^w' # Ceil(param));" >Move Speed: 240</label>
+								</frame>
+							</panel>
+							
+							<panel y="20" height="122" color="invisible" >						
+								<frame style="lobby_window_footer_bg" height="100%" color="#00000077" borderthickness="6" noclick="true"></frame>
+								<frame style="lobby_window_footer" height="100%"  borderthickness="6" noclick="true"/>
+								
+								<panel color="invisible" float="right" padding="10">
+									<anchor y="2" x="8" />
+									
+								<!-- health -->
+								<panel width="48" align="left" height="48" color="blue">
+									<image name="health_icon"  width="48" height="48" style="icon" texture="/ui/elements/health_icon.tga"/>
+									<image width="48" height="48" style="icon"  rendermode="overylay" texture="/ui/elements/icon_bevel.tga" color="#FFFFFFAA"/>
+									<frame y="49" x="-2" width="52" height="70"  borderthickness="8" texture="/ui/frames/inset_round.tga" color="black">
+										<label y="0" x="0" width="48" textalign="center" font="gametiny" color="yellow">Value:</label>					
+									
+									
+										<label y="32" x="1" width="48" textalign="center" font="chat_10" color="yellow">Regen:</label>
+										
+										<panel watch="Entity" ontrigger="SetVisible(!StringEquals(Entity,'Player_Observer'));">
+											<label y="12" width="48" textalign="center" font="chat_10" watch="AdjustedMaxHealth" ontrigger="SetText(Ceil(param));"  color="white" />
+											<label y="22" width="48" textalign="center" font="chat_10" watch="MaxHealthBonus" ontrigger="SetVisible(param != 0); SetText(Ceil(param)); If(param lt 0, SetColor('#FF0000'), SetColor('#00FF00'));" color="#00FF00" visible="false" />
+
+											<label y="44" x="0" width="48" textalign="center" font="chat_10" watch="AdjustedHealthRegen" ontrigger="SetText(FtoA(param, 2));" color="white" />
+											<label y="54" width="48" textalign="center" font="chat_10" watch="HealthRegenBonus" ontrigger="SetVisible(param != 0); SetText(FtoA(param, 2)); If(param lt 0, SetColor('#FF0000'), SetColor('#00FF00'));" color="#00FF00" visible="false" />
+									    </panel>
+									
+									</frame>
+								</panel>
+
+								<!-- mana -->
+								<panel width="48" align="center" height="48" color="blue">
+									<image name="armor_icon"  width="48" height="48" style="icon" texture="/ui/elements/mana_icon.tga"/>
+									<image width="48" height="48" style="icon" rendermode="overylay" texture="/ui/elements/icon_bevel.tga" color="#FFFFFFAA"/>
+									<frame y="49" x="-2" width="52" height="70"  borderthickness="8" texture="/ui/frames/inset_round.tga" color="black">
+										<label y="0" x="0" width="48" textalign="center" font="chat_10" color="yellow">Value:</label>
+										<label y="32" x="1" width="48" textalign="center" font="chat_10" color="yellow">Regen:</label>
+										
+										<panel watch="Entity" ontrigger="SetVisible(!StringEquals(Entity,'Player_Observer'));">
+										<label y="12" width="48" textalign="center" font="chat_10" watch="AdjustedMaxMana" ontrigger="SetText(Ceil(param));" color="white"/>
+										<label y="22" width="48" textalign="center" font="chat_10" watch="MaxManaBonus" ontrigger="SetVisible(param != 0); SetText(Ceil(param)); If(param lt 0, SetColor('#FF0000'), SetColor('#00FF00'));" color="lime" visible="false"/>
+										<label y="44" x="0" width="48" textalign="center" font="chat_10" watch="AdjustedManaRegen" ontrigger="SetText(FtoA(param, 2));" color="white"/>
+										<label y="54" width="48" textalign="center"  font="chat_10" watch="ManaRegenBonus" ontrigger="SetVisible(param != 0); SetText(FtoA(param, 2)); If(param lt 0, SetColor('#FF0000'), SetColor('#00FF00'));" color="#00FF00" visible="false"/>
+										</panel>
+									</frame>
+								</panel>
+
+								<!-- stam -->
+								<panel width="48" align="center" height="48" color="blue">
+									<image name="armor_icon"  width="48" height="48" style="icon" texture="/ui/elements/stamina_icon.tga"/>
+									<image width="48" height="48" style="icon"  rendermode="overylay" texture="/ui/elements/icon_bevel.tga" color="#FFFFFFAA"/>
+									<frame y="49" x="-2" width="52" height="70"  borderthickness="8" texture="/ui/frames/inset_round.tga" color="black">
+										<label y="0" x="0" width="48" textalign="center" font="chat_10" color="yellow">Value:</label>
+										<label y="32" x="1" width="48" textalign="center" font="chat_10" color="yellow">Regen:</label>
+										<panel watch="Entity" ontrigger="SetVisible(!StringEquals(Entity,'Player_Observer'));">			
+											<label  y="12" width="48" textalign="center" font="chat_10" watch="AdjustedMaxStamina" ontrigger="SetText(Ceil(param));"  color="white" />
+											<label  y="22" width="48" textalign="center" font="chat_10" watch="MaxStaminaBonus" ontrigger="SetVisible(param != 0); SetText(Ceil(param)); If(param lt 0, SetColor('#FF0000'), SetColor('#00FF00'));"  color="#00FF00" visible="false" />
+											<label y="44" x="0"  width="48" textalign="center" font="chat_10" watch="AdjustedStaminaRegen" ontrigger="SetText(FtoA(param, 2));" color="white" />
+											<label  y="54" width="48" textalign="center"  font="chat_10" watch="StaminaRegenBonus" ontrigger="SetVisible(param != 0); SetText(FtoA(param, 2)); If(param lt 0, SetColor('#FF0000'), SetColor('#00FF00'));"  color="#00FF00" visible="false" />
+										</panel>
+									</frame>
+								</panel>
+
+								<!-- Armor -->
+								<panel width="48" align="center" height="48" color="blue">
+									<image name="armor_icon"  width="48" height="48" style="icon" texture="/ui/elements/armor_icon2.tga"/>
+									<image width="48" height="48" style="icon"  rendermode="overylay" texture="/ui/elements/icon_bevel.tga" color="#FFFFFFAA"/>
+									<frame y="49" x="-2" width="52" height="70"  borderthickness="8" texture="/ui/frames/inset_round.tga" color="black">
+										<label y="0" x="0" width="48" textalign="center" font="chat_10" color="yellow">Armor:</label>
+										<label y="32" x="1" width="48" textalign="center" font="chat_10" color="yellow">Percent:</label>
+										<panel watch="Entity" ontrigger="SetVisible(!StringEquals(Entity,'Player_Observer'));">											
+											<label y="12" width="48" textalign="center"  font="chat_10" watch="AdjustedArmor" ontrigger="SetText(FtoA(param, 1));"  color="white" />
+											<label y="22" width="48" textalign="center"  font="chat_10" watch="ArmorBonus" ontrigger="SetVisible(param != 0); SetText(FtoA(param, 1)); If(param lt 0, SetColor('#FF0000'), SetColor('#00FF00'));" color="#00FF00" visible="false" />
+									
+											<label y="44" x="0"  width="48" textalign="center" font="chat_10" watch="AdjustedArmorReduction" ontrigger="SetText(FtoP(param, 1) # '%');" color="white" />
+											<label y="54" width="48" textalign="center" font="chat_10" precision="2" watch="ArmorReductionBonus" ontrigger="SetVisible(param != 0); SetText(FtoP(param, 1) # '%'); If(param lt 0, SetColor('#FF0000'), SetColor('#00FF00'));" color="#00FF00" visible="false" />
+										</panel>
+									</frame>
+								</panel>
+							
+							</panel>
+						</panel>
+					</panel>
+
+					<panel x="250" y="165" width="290" name="my_details"  height="110" color="invisible">
+						<frame texture="/ui/frames/rounded_bg_white.tga" borderthickness="8" style="lobby_window_bg"/>
+						<frame texture="/ui/frames/roundframe.tga"  color="#5E2D1F" borderthickness="8"/>
+						
+						
+						<panel align="right" x="-10" y="10" width="48" height="42">
+							<frame texture="/ui/frames/roundframe.tga"  color="#5E2D1F" borderthickness="8"/>
+							<label y="-8" width="100%" align="center" valign="center" textvalign="center" textalign="center" height="20" font="chat_18" color="1 0 1 1" shadow="true" watch="Level" ontrigger="SetText(param);">7</label>	
+							<label y="-3" width="100%" align="center" valign="bottom" textvalign="bottom" textalign="center" height="20" font="chat_12" color="1 0 1 1" shadow="true">Level</label>	
+						</panel>
+						
+						
+						<panel align="left" x="10" y="10" width="48" height="42">
+							<frame texture="/ui/frames/roundframe.tga"  color="#5E2D1F" borderthickness="8"/>
+							<label y="-8" width="100%" align="center" valign="center" textvalign="center" textalign="center" height="20" font="chat_18" color="1 1 0 1" shadow="true" watch="LoadoutSF" ontrigger="SetText(param);">99</label>	
+							<label y="-3" width="100%" align="center" valign="bottom" textvalign="bottom" textalign="center" height="20" font="chat_12" color="1 1 0 1" shadow="true">SF</label>	
+						</panel>						
+						<label y="-85" width="100%" textalign="center" align="center" valign="bottom" textvalign="center" height="12" font="chat_14" color="white" shadow="true" watch="Name" ontrigger="SetText(param);">???????</label>	
+						<label y="-65" width="100%" textalign="center" align="center" valign="bottom" textvalign="center" height="12" font="chat_12" color="1 0 1 1" shadow="true"  watch="LoadoutExperience" ontrigger="SetText('Experience: ' # Round(param));">Experience: 23,100</label>	
+						<panel height="10" width="55%" color="blue" align="center" valign="bottom" y="-50">						
+							<frame  color="white" visible="1" texture="/ui/frames/inset.tga"  >
+								<panel width="-4" height="-4" align="center" valign="center">	
+									<image name="exp_neg" texture="/ui/fps/exp_negative.tga"/>
+									<image width="80%" texture="/ui/elements/health_pos_r.tga" watch="Experience" ontrigger="SetWidth(FtoP(param));" />
+									<image width="80%" texture="/ui/elements/health_pos_y.tga" watch="Experience" ontrigger="SetWidth(FtoP(param)); setcolor(1, 0, 1, 1);" />
+									<image width="80%" texture="/ui/elements/health_pos.tga" watch="Experience" ontrigger="SetWidth(FtoP(param)); setcolor(1, 0, 1, 1);" />
+								</panel>
+							</frame>						
+						</panel>
+									
+						<label y="-35" width="100%" textalign="center" align="center" valign="bottom" textvalign="center" height="12" font="chat_12" color="white" shadow="true">Current Health</label>					
+						<panel height="20" width="95%" color="blue" align="center" valign="bottom" y="-10">						
+							<frame  color="white" visible="1" texture="/ui/frames/inset.tga"  >
+								<panel width="-4" height="-4" align="center" valign="center">	
+									<image texture="/ui/elements/health_neg.tga"/>
+									<image width="80%" texture="/ui/elements/health_pos_r.tga" watch="HealthPercent" ontrigger="SetWidth(FtoP(param));" />
+									<image width="80%" texture="/ui/elements/health_pos_y.tga" watch="HealthPercent" ontrigger="SetWidth(FtoP(param)); setcolor(1, 1, 1, saturate((param * 2.5) - 0.25));" />
+									<image width="80%" texture="/ui/elements/health_pos.tga" watch="HealthPercent" ontrigger="SetWidth(FtoP(param)); setcolor( 1, 1, 1, saturate((param * 2) - 1));" />
+
+									<image x="80%" width="2" color="white" watch="HealthPercent" ontrigger="SetX(FtoP(param));" />
+									<label y="0" x="0" width="100%" height="100%" textvalign="center" color="white" shadow="1" font="chat_11" textalign="center" watch="HealthValue AdjustedMaxHealth" ontrigger="SetText(Ceil(HealthValue) # ' / ' # Ceil(AdjustedMaxHealth));"/>
+								</panel>
+							</frame>						
+						</panel>
+						</panel>
+				</panel>			
+			</panel>
+			<!-- END TOP HALF -->
+			
+			
+			<anchor y="310"/>
+			<panel height="446" color="invisible" valign="bottom">	
+				
+							
+				<panel y="4" x="10" width="52%" color="invisible">					
+					
+					<panel height="20">
+						<frame  x="0" style="lobby_window_header_bg" height="100%"  texture="/ui/frames/rounded_header_bg_white.tga"   borderthickness="8"></frame> <!-- frame header bg -->
+						<frame  x="0" texture="/ui/frames/roundframe_header.tga" height="100%"  color="#863838" borderthickness="8">
+							<label x="7" align="left" valign="center" textvalign="center" height="20" font="chat_12" color="white" shadow="true">Special Abilities</label>							
+						</frame>
+					</panel>
+					<panel y="-38%" x="3%" width="90%" height="10%" align="left" valign="center" color="0 0 0 .5">
+						<label x="7" align="left" width="95%" valign="top" textvalign="center" height="30" font="chat_12" color="1 1 1 1" shadow="true" wrap="true"> ^rNOTE: ^wYou can press the "^gY^w" key at any time to view a description of your abilities</label>							
+					</panel>
+
+					<button y="7" onframe="If(_abilitystart gt 0, ShowWidget('ability_up'), HideWidget('ability_up'));" onclick="If(_abilitystart gt 0, Split(Set(_abilitystart, _abilitystart - 1), Set(_curability, 0), RefreshInterface(), PlaySound('/shared/sounds/ui/button_click.mp3')));" height="16" color="invisible">
+						<image name="ability_up" noclick="true" blockinput="false" align="center" width="128" texture="/ui/elements/com_scroll_up.tga"/>
+					</button>
+
+					<panel y="75" float="bottom" stickytoinvis="false" color="invisible" padding="4" onload="CreateInt('_curability', 0); CreateInt('_abilitystart', 0); CreateString('_lastentity', 'Player_Observer');" watch="Entity" ontrigger="If(!StringEquals(_lastentity, param), Split(Set(_curability, 0), Set(_abilitystart, 0), Set(_lastentity, param), RefreshInterface()));">
+						<instance name="abilities" manacost="99" cooldown="99" index="0"/>								
+						<instance name="abilities" manacost="99" cooldown="99" index="1"/>								
+						<instance name="abilities" manacost="99" cooldown="99" index="2"/>	
+						<instance name="abilities" manacost="99" cooldown="99" index="3"/>								
+						<instance name="abilities" manacost="99" cooldown="99" index="4"/>		
+						<instance name="abilities" manacost="99" cooldown="99" index="5"/>								
+						<instance name="abilities" manacost="99" cooldown="99" index="6"/>							
+						<instance name="abilities" manacost="99" cooldown="99" index="7"/>
+						<instance name="abilities" manacost="99" cooldown="99" index="8"/>
+					</panel>
+					
+					<button y="330" onframe="If((_abilitystart + 3) lt _curability, ShowWidget('ability_down'), HideWidget('ability_down'));" onclick="If((_abilitystart + 3) lt _curability, Split(Set(_abilitystart, _abilitystart + 1), Set(_curability, 0), RefreshInterface(), PlaySound('/shared/sounds/ui/button_click.mp3')));" height="16" color="invisible">
+						<image name="ability_down" noclick="true" blockinput="false" align="center" width="128" texture="/ui/elements/com_scroll_down.tga"/>
+					</button>
+				</panel>
+
+				<panel name="report_widget" x="10" y="4" align="left" width="52%"  height="74%" visible="false" onload="CreateString('report_reason', 'no reason provided');">
+					<frame style="lobby_window_bg" texture="/ui/frames/rounded_bg_white.tga" color="#000000EE" borderthickness="12" noclick="true"></frame>
+					<frame style="lobby_window"  texture="/ui/frames/roundframe.tga"  borderthickness="12" noclick="true"></frame>
+					<frame style="lobby_window_header_bg" texture="/ui/frames/rounded_header_bg_white.tga" height="26" borderthickness="12" noclick="true"> </frame>	
+					<frame style="lobby_window_header" texture="/ui/frames/roundframe_header.tga" height="26" borderthickness="12" noclick="true">
+						<label x="10" align="center" valign="center" textvalign="center" height="20" font="chat_12" color="red" shadow="true">Report a Problem</label>							
+					</frame>	
+					
+					<label y="30" x="10" width ="90%" height="20" wrap="true" textalign="left" textvalign="center" align="left" font="chat_12" color="white" shadow="true">Is there something wrong with your Savage 2 experience? Please tell us below:</label>
+					<frame texture="/ui/frames/inset.tga" x="20" width="90%" y="80" height="40%" borderthickness="2">
+						<textbuffer name="report_reason_textinput" x="4" width="100%" y="0" height="100%" maxlength="250" usescrollbar="false" textalign="left" font="chat_12" textcolor="orange" shadow="false" color="invisible" wrap="true" editable="true" onchange="Set('report_reason', this);" onshow="ClearBufferText();"/>
+					</frame>
+					<instance
+							align="center"
+							y="235"
+							name="round_button2"							
+							width="160" height="26"
+							font="chat_12"
+							label="Report"
+							watch="LobbyPhase"
+							ontrigger="SetVisible(LobbyPhase == 5);"
+							onclick="Set(report_reason, StripChar(' ', report_reason)); Set(report_reason, StripChar('&amp;', report_reason)); Set(report_reason, StripChar('/', report_reason));  httpgetfile('http://188.40.92.72/brogor/report_match.php?action=reportGame&amp;matchid='#Entity_NpcController_Description#'&amp;time='#cg_gameTime#'&amp;reporter='#Name#'&amp;reason='#report_reason#'&amp;spamtest=nospamplease', '/tmp/doesntmatter'); HideWidget('report_widget');"
+							onmouseover=""
+							onmouseout="HideWidget('demo_attribute_tip');"
+						/>
+
+					<instance
+							align="center"
+							y="265"
+							name="round_button2"							
+							width="160" height="26"
+							font="chat_12"
+							label="Cancel"
+							watch="LobbyPhase"
+							ontrigger="SetVisible(LobbyPhase == 5);"
+							onclick="HideWidget('report_widget');"
+							onmouseover="if(IsDemoAccount(), ShowWidget('demo_attribute_tip'));"
+							onmouseout="HideWidget('demo_attribute_tip');"
+						/>
+				</panel>		
+								
+				<panel x="-10" y="4"   height="300" align="right" width="44%" color="invisible">					
+					<panel height="20">
+						<frame  x="0" style="lobby_window_header_bg" height="100%" texture="/ui/frames/rounded_header_bg_white.tga"   borderthickness="8"></frame> <!-- frame header bg -->
+						<frame  x="0" texture="/ui/frames/roundframe_header.tga" height="100%"  color="#863838" borderthickness="8">
+							<label x="7" align="left" valign="center" textvalign="center" height="20" font="chat_12" color="white" shadow="true">Weapons</label>							
+						</frame>
+					</panel>
+					<panel y="18" float="bottom" padding="4" watch="Entity" ontrigger="SetVisible(!StringEquals(Entity,'Player_Observer'));">	
+						
+						<instance name="melee" manacost="99" cooldown="99" index="0"/>								
+						<instance name="melee" manacost="99" cooldown="99" index="1"/>								
+						<instance name="melee" manacost="99" cooldown="99" index="2"/>	
+						<instance name="melee" manacost="99" cooldown="99" index="3"/>								
+						<instance name="melee" manacost="99" cooldown="99" index="4"/>								
+						<instance name="melee" manacost="99" cooldown="99" index="5"/>								
+						<instance name="melee" manacost="99" cooldown="99" index="6"/>	
+						<instance name="melee" manacost="99" cooldown="99" index="7"/>	
+						<instance name="melee" manacost="99" cooldown="99" index="8"/>	
+						
+						<instance name="rangedammo" manacost="99" cooldown="99" index="0"/>								
+						<instance name="rangedammo" manacost="99" cooldown="99" index="1"/>								
+						<instance name="rangedammo" manacost="99" cooldown="99" index="2"/>	
+						<instance name="rangedammo" manacost="99" cooldown="99" index="3"/>								
+						<instance name="rangedammo" manacost="99" cooldown="99" index="4"/>								
+						<instance name="rangedammo" manacost="99" cooldown="99" index="5"/>								
+						<instance name="rangedammo" manacost="99" cooldown="99" index="6"/>							
+						<instance name="rangedammo" manacost="99" cooldown="99" index="7"/>							
+						<instance name="rangedammo" manacost="99" cooldown="99" index="8"/>							
+						
+						<instance name="rangedmana" manacost="99" cooldown="99" index="0"/>								
+						<instance name="rangedmana" manacost="99" cooldown="99" index="1"/>								
+						<instance name="rangedmana" manacost="99" cooldown="99" index="2"/>	
+						<instance name="rangedmana" manacost="99" cooldown="99" index="3"/>								
+						<instance name="rangedmana" manacost="99" cooldown="99" index="4"/>								
+						<instance name="rangedmana" manacost="99" cooldown="99" index="5"/>								
+						<instance name="rangedmana" manacost="99" cooldown="99" index="6"/>							
+						<instance name="rangedmana" manacost="99" cooldown="99" index="7"/>							
+						<instance name="rangedmana" manacost="99" cooldown="99" index="8"/>							
+					</panel>
+				</panel>
+				
+				
+				<panel x="-40" y="220"  width="238"   height="180" align="right" color="invisible">					
+					<panel height="20">
+						<frame  x="0" style="lobby_window_header_bg" height="100%" texture="/ui/frames/rounded_header_bg_white.tga"   borderthickness="8"></frame> <!-- frame header bg -->
+						<frame  x="0" texture="/ui/frames/roundframe_header.tga" height="100%"  color="#863838" borderthickness="8">
+							<label x="7" align="left" valign="center" textvalign="center" height="20" font="chat_12" color="white" shadow="true">Inventory</label>							
+						</frame>
+					</panel>
+						
+
+						
+					<panel y="20" width="238" height="142">
+						<frame style="lobby_window_footer_bg" height="100%" color="0 0 0 .4" borderthickness="6" noclick="true"></frame>
+						<frame style="lobby_window_footer" height="100%"  borderthickness="6" noclick="true"></frame>
+
+						<instance name="backpack_slot" slot="13" yoffset="4" xoffset="6"/>
+						<instance name="free_itemSlotLock" slot="14" yoffset="4" xoffset="88"/>
+						<instance name="free_itemSlotLock" slot="15" yoffset="4" xoffset="168"/>
+						
+						<instance name="backpack_slot" slot="10" yoffset="72" xoffset="6"/>
+						<instance name="backpack_slot" slot="11" yoffset="72" xoffset="88"/>
+						<instance name="backpack_slot" slot="12" yoffset="72" xoffset="168"/>
+						
+						<instance name="backpack_slot_snap" slot="13" yoffset="0" xoffset="6"/>
+						<instance name="backpack_slot_snap" slot="14" yoffset="0" xoffset="88"/>
+						<instance name="backpack_slot_snap" slot="15" yoffset="0" xoffset="168"/>
+						
+						<instance name="backpack_slot_snap" slot="10" yoffset="72" xoffset="0"/>
+						<instance name="backpack_slot_snap" slot="11" yoffset="72" xoffset="88"/>
+						<instance name="backpack_slot_snap" slot="12" yoffset="72" xoffset="168"/>						
+						
+						
+						
+						
+					</panel>					
+				</panel>
+				
+								
+				<!--warmup -->
+				<button
+					y="-6" x="-30"  width="258" height="42" valign="bottom" align="right" color="black"
+					onclick="PlaySound('/shared/sounds/ui/spawn.mp3'); Spawn(); ClearPlayerDetailsTarget();"
+					watch="LoadoutSpawn" ontrigger="SetEnabled(param);"
+					watch0="LobbyPhase" ontrigger0="SetVisible(param == 6);"
+				>
+					<widgetstate statename="up">
+						<frame texture="/ui/frames/rounded_button_bg_white.tga" borderthickness="8" color="white"/>
+						<frame texture="/ui/frames/roundframe.tga" color="gray" borderthickness="8"/>
+						<label width="100%" height="100%" textvalign="center" textalign="center" valign="center" align="center" font="chat_14" color="black" shadow="true" shadowcolor="gray">Click to Enter Warm Up</label>
+					</widgetstate>
+					<widgetstate statename="over">
+						<frame texture="/ui/frames/rounded_button_bg_white.tga" borderthickness="8" color="1 .4 0 1"/>
+						<frame texture="/ui/frames/roundframe.tga" color="#7F6E00" borderthickness="8"/>
+						<label width="100%" height="100%" textvalign="center" textalign="center" valign="center" align="center" font="chat_14" color="white" shadow="true" shadowcolor="#7F6E00">Click to Enter Warm Up</label>
+					</widgetstate>
+					<widgetstate statename="down" x="1" y="1">
+						<frame texture="/ui/frames/rounded_button_bg_white.tga" borderthickness="8" color="1 .3 0 1"/>
+						<frame texture="/ui/frames/roundframe.tga" color="#7F6E00" borderthickness="8"/>
+						<label width="100%" height="100%" textvalign="center" textalign="center" valign="center" align="center" font="chat_14" color="#3f0001" shadow="true" shadowcolor="#7F6E00">Click to Enter Warm Up</label>
+					</widgetstate>
+					<widgetstate statename="disabled">
+						<frame texture="/ui/frames/rounded_button_bg_white.tga" borderthickness="8" color="#666666"/>
+						<frame texture="/ui/frames/roundframe.tga" color="#666666" borderthickness="8"/>
+						<label width="100%" height="100%" textvalign="center" textalign="center" valign="center" align="center" font="chat_14" color="#333333" shadow="true" shadowcolor="black">Click to Enter Warm Up</label>
+					</widgetstate>
+					<panel color="black" watch="LoadoutTime" ontrigger="SetVisible(param > 0);">
+						<frame texture="/ui/frames/rounded_button_bg_white.tga" borderthickness="8" color="#666666"/>
+						<frame texture="/ui/frames/roundframe.tga" color="#666666" borderthickness="8"/>						
+						<label name="loadout_timer" font="gametweener" textalign="center" textvalign="center" watch="LoadoutTime" ontrigger="SetText('Wait to Spawn for: ' # param # ' sec');"/>
+					</panel>				
+				</button>	
+
+				<!--reg spawn-->
+				<button
+					y="-6" x="-30"  width="258" height="42" valign="bottom" align="right" color="black"
+					onclick="PlaySound('/shared/sounds/ui/spawn.mp3'); Spawn(); ClearPlayerDetailsTarget(); Set('_showstats', true);"
+					watch="LoadoutSpawn" ontrigger="SetEnabled(param);"
+					watch0="LobbyPhase" ontrigger0="SetVisible(param != 6);"
+				>
+					<widgetstate statename="up">
+						<frame texture="/ui/frames/rounded_button_bg_white.tga" borderthickness="8" color="white"/>
+						<frame texture="/ui/frames/roundframe.tga" color="gray" borderthickness="8"/>
+						<label width="100%" height="100%" textvalign="center" textalign="center" valign="center" align="center" font="chat_14" color="black" shadow="true" shadowcolor="gray">Click to Spawn</label>
+					</widgetstate>
+					<widgetstate statename="over">
+						<frame texture="/ui/frames/rounded_button_bg_white.tga" borderthickness="8" color="1 .4 0 1"/>
+						<frame texture="/ui/frames/roundframe.tga" color="#7F6E00" borderthickness="8"/>
+						<label width="100%" height="100%" textvalign="center" textalign="center" valign="center" align="center" font="chat_14" color="white" shadow="true" shadowcolor="#7F6E00">Click to Spawn</label>
+					</widgetstate>
+					<widgetstate statename="down" x="1" y="1">
+						<frame texture="/ui/frames/rounded_button_bg_white.tga" borderthickness="8" color="1 .3 0 1"/>
+						<frame texture="/ui/frames/roundframe.tga" color="#7F6E00" borderthickness="8"/>
+						<label width="100%" height="100%" textvalign="center" textalign="center" valign="center" align="center" font="chat_14" color="#3f0001" shadow="true" shadowcolor="#7F6E00">Click to Spawn</label>
+					</widgetstate>
+					<widgetstate statename="disabled">
+						<frame texture="/ui/frames/rounded_button_bg_white.tga" borderthickness="8" color="#666666"/>
+						<frame texture="/ui/frames/roundframe.tga" color="#666666" borderthickness="8"/>
+						<label width="100%" height="100%" textvalign="center" textalign="center" valign="center" align="center" font="chat_14" color="#333333" shadow="true" shadowcolor="black">Click to Spawn</label>
+					</widgetstate>
+					<panel color="black" watch="LoadoutTime" ontrigger="SetVisible(param > 0);">
+						<frame texture="/ui/frames/rounded_button_bg_white.tga" borderthickness="8" color="#666666"/>
+						<frame texture="/ui/frames/roundframe.tga" color="#666666" borderthickness="8"/>						
+						<label name="loadout_timer" font="gametweener" textalign="center" textvalign="center" watch="LoadoutTime" ontrigger="SetText('Wait to Spawn for: ' # param # ' sec');"/>
+					</panel>				
+				</button>
+
+			<!--report button-->
+				<button
+					y="-6" x="-100"  width="200" height="42" valign="bottom" align="center" color="black"
+					onclick="ShowWidget('report_widget');"
+					watch="LobbyPhase" ontrigger="SetVisible(param == 5);"
+				>
+					<widgetstate statename="up">
+						<frame texture="/ui/frames/rounded_button_bg_white.tga" borderthickness="8" color="white"/>
+						<frame texture="/ui/frames/roundframe.tga" color="gray" borderthickness="8"/>
+						<label width="100%" height="100%" textvalign="center" textalign="center" valign="center" align="center" font="chat_14" color="black" shadow="true" shadowcolor="gray">Report Problem</label>
+					</widgetstate>
+					<widgetstate statename="over">
+						<frame texture="/ui/frames/rounded_button_bg_white.tga" borderthickness="8" color="1 .4 0 1"/>
+						<frame texture="/ui/frames/roundframe.tga" color="#7F6E00" borderthickness="8"/>
+						<label width="100%" height="100%" textvalign="center" textalign="center" valign="center" align="center" font="chat_14" color="white" shadow="true" shadowcolor="#7F6E00">Report Problem</label>
+					</widgetstate>
+					<widgetstate statename="down" x="1" y="1">
+						<frame texture="/ui/frames/rounded_button_bg_white.tga" borderthickness="8" color="1 .3 0 1"/>
+						<frame texture="/ui/frames/roundframe.tga" color="#7F6E00" borderthickness="8"/>
+						<label width="100%" height="100%" textvalign="center" textalign="center" valign="center" align="center" font="chat_14" color="#3f0001" shadow="true" shadowcolor="#7F6E00">Report Problem</label>
+					</widgetstate>
+					<widgetstate statename="disabled">
+						<frame texture="/ui/frames/rounded_button_bg_white.tga" borderthickness="8" color="white" />
+						<frame texture="/ui/frames/roundframe.tga" color="gray" borderthickness="8"/>
+						<label width="100%" height="100%" textvalign="center" textalign="center" valign="center" align="center" font="chat_14" color="black" shadow="true" shadowcolor="gray">Report Problem</label>
+					</widgetstate>
+					<panel color="black" watch="LoadoutTime" ontrigger="SetVisible(param > 0);">
+						<frame texture="/ui/frames/rounded_button_bg_white.tga" borderthickness="8" color="white"/>
+						<frame texture="/ui/frames/roundframe.tga" color="gray" borderthickness="8"/>
+						<label name="report_button_label" font="gametweener" textalign="center" textvalign="center" color="black" shadow="true" shadowcolor="gray">Report Problem</label> <!-- watch="LoadoutTime"  ontrigger="SetText('Report Problem');" -->
+					</panel>				
+				</button>					
+
+				
+				
+				
+			</panel>
+			
+			
+			<!-- HEADER BUTTONS -->
+			<anchor y="5"/>
+			<panel name="drop_downs" height="32" color="invisible" float="right" padding="10">
+				<panel  width="32.1%" color="invisible">			
+					<instance name="header_button" tag="item_store" label="Item Store" image="/items/icons/minor_health.tga"  lvlup="0 0 0 0"/>
+					<panel name="item_store" y="30" width="650" height="302" onmouseover="showwidget('item_store'); showwidget('item_store_hightlight');" onmouseout="hidewidget('item_store'); hidewidget('item_store_hightlight');" color="invisible" visible="0">
+						<frame style="lobby_window_bg" height="100%" borderthickness="8" color=".8 .3 0 1"  noclick="true">
+							<image texture="/ui/elements/shrine_back_2.tga" color="1 1 1 .6" noclick="1"/>
+						</frame>
+						<frame style="lobby_window"   height="100%"  borderthickness="8" noclick="true"></frame>
+						
+						<snaptarget
+							x="0" y="24"
+							width="256" height="152"
+							align="center"
+							onsnap="Sell(*(param # '_Slot'), 1); PlaySound('/shared/sounds/ui/sell.mp3');"
+						/>
+
+						<panel name="test" x="9" y="29"  float="right" padding="5" color="invisible" onmouseover="showwidget('item_store'); showwidget('item_store_hightlight');" onmouseout="hidewidget('item_store'); hidewidget('item_store_hightlight');">
+							<panel height="20" y="-21" width="130" x="30" noclick="true" passivechildren="true">
+								<frame  x="0" style="lobby_window_header_bg" height="100%"  texture="/ui/frames/rounded_header_bg_white.tga"   borderthickness="8"></frame> <!-- frame header bg -->
+								<frame  x="0" texture="/ui/frames/roundframe_header.tga" height="100%"  color="#863838" borderthickness="8">
+									<label x="7" align="left" valign="center" textvalign="center" height="20" font="chat_12" color="white" shadow="true">Consumable Items</label>							
+								</frame>
+							</panel>
+							<panel height="20" y="-21" width="110" x="326" noclick="true" passivechildren="true">
+								<frame  x="0" style="lobby_window_header_bg" height="100%"  texture="/ui/frames/rounded_header_bg_white.tga"   borderthickness="8"></frame> <!-- frame header bg -->
+								<frame  x="0" texture="/ui/frames/roundframe_header.tga" height="100%"  color="#863838" borderthickness="8">
+									<label x="7" align="left" valign="center" textvalign="center" height="20" font="chat_12" color="white" shadow="true">Enduring Items</label>							
+								</frame>
+							</panel>
+							<anchor x="30"/>
+							<instance name="consumable_item_slot" slot="0"/>
+							<instance name="consumable_item_slot" slot="1"/>
+							<instance name="consumable_item_slot" slot="2"/>
+							<instance name="consumable_item_slot" slot="3"/>
+							<instance name="consumable_item_slot" slot="4"/>
+							
+							<anchor x="30" y="52" />
+							<instance name="consumable_item_slot" slot="5"/>
+							<instance name="consumable_item_slot" slot="6"/>
+							<instance name="consumable_item_slot" slot="7"/>
+							<instance name="consumable_item_slot" slot="8"/>
+							<instance name="consumable_item_slot" slot="9"/>
+							
+							
+							<anchor  x="30" y="104" />
+							<instance name="consumable_item_slot" slot="10"/>
+							<instance name="consumable_item_slot" slot="11"/>
+							<instance name="consumable_item_slot" slot="12"/>
+							<instance name="consumable_item_slot" slot="13"/>
+							<instance name="consumable_item_slot" slot="14"/>
+							
+							<anchor x="326" />
+							<instance name="consumable_item_slot" slot="15"/>
+							<instance name="consumable_item_slot" slot="16"/>
+							<instance name="consumable_item_slot" slot="17"/>
+							<instance name="consumable_item_slot" slot="18"/>
+							
+
+							
+							<anchor x="326"  y="52" />
+							<instance name="consumable_item_slot" slot="20"/>
+							<instance name="consumable_item_slot" slot="21"/>
+							<instance name="consumable_item_slot" slot="22"/>
+							<instance name="consumable_item_slot" slot="23"/>
+							
+
+							
+							<anchor x="326"  y="104" />
+							<instance name="consumable_item_slot" slot="25"/>
+							<instance name="consumable_item_slot" slot="26"/>
+							<instance name="consumable_item_slot" slot="27"/>
+							<instance name="consumable_item_slot" slot="19"/>
+							
+						</panel>
+						
+						<panel  y="-10" width="96%" height="100" align="center" valign="bottom" noclick="true" color="invisible">
+							<frame style="lobby_window_bg" height="100%" color="0 0 0 .8"  noclick="true"></frame>
+							<frame style="lobby_window"   height="100%"   noclick="true"></frame>
+							
+							<frame name="loadout_item_tooltip" style="tooltip_frame" color="invisible" visible="0" noclick="true" onmouseout="hidewidget('item_store_hightlight')" >
+				
+								<label name="loadout_item_tooltip_name" x="12" y="8" width="255" height="22" textalign="left" font="gametweener" color="Yellow">Cripple (^291P^*)</label>
+
+
+								<label name="loadout_item_tooltip_prerequisiteheader" x="190" y="8" width="255" height="22" textalign="left" font="gametweener" color="White">Prerequisite:</label>								
+								<label name="loadout_item_tooltip_prerequisite" x="285" y="8" width="255" height="22" textalign="left" font="gametweener" color="Red">Building</label>
+
+								
+								<label name="loadout_item_tooltip_costheader" x="-70" y="8" width="48"  align="right" height="16" textalign="right" font="gametweener" color="Yellow">Cost:</label>
+								<label name="loadout_item_tooltip_cost" x="-20" y="8" precision="0" width="48" align="right" height="22" textalign="left" font="gametweener" color="Yellow">200</label>
+
+								<label name="loadout_item_tooltip_description" y="30" width="-26" height="-32" align="center" font="gametiny" wrap="true" color="white">The ability to slow the movement speed of an enemy unit by 30% for 15 seconds.</label>
+							</frame>
+						</panel>
+				
+					</panel>
+				</panel>
+				<panel  width="32.1%" color="invisible">			
+					<instance name="header_button" tag="persistent_vault" label="Persistent Vault" image="/ui/elements/vault.tga" lvlup="0 0 0 0"/>
+					<panel x="-254" name="persistent_vault" y="26" width="547" height="375" onmouseover="showwidget('persistent_vault'); showwidget('persistent_vault_hightlight');" onmouseout="hidewidget('persistent_vault'); hidewidget('persistent_vault_hightlight');" color="invisible" visible="0">
+						<frame style="lobby_window_bg" height="100%"  noclick="true" borderthickness="8" color=".8 .3 0 1"  onmouseover="showwidget('persistent_vault');" onmouseout="hidewidget('persistent_vault');">
+							<image texture="/ui/elements/shrine_back_2.tga" color="1 1 1 .6" noclick="1"/>
+						</frame>
+						<frame style="lobby_window"   height="100%"   noclick="true" borderthickness="8"  onmouseover="showwidget('persistent_vault');" onmouseout="hidewidget('persistent_vault');"></frame>						
+							
+							<panel y="20" align="center" valign="top" noclick="true" color="invisible" width="87%" height="102" >
+								<frame style="lobby_window_bg" height="100%"  noclick="true" color="0 0 0 .8" onmouseover="showwidget('persistent_vault');  showwidget('persistent_vault_hightlight');" onmouseout="hidewidget('persistent_vault');"></frame>
+								<frame style="lobby_window"   height="100%"   noclick="true" onmouseover="showwidget('persistent_vault');  showwidget('persistent_vault_hightlight');" onmouseout="hidewidget('persistent_vault');"></frame>									
+								<panel  x="20" y="0" float="right" padding="28" onload="CreateInt('_cur_loadout_item', 0);" onmouseover="showwidget('persistent_vault');  showwidget('persistent_vault_hightlight');" onmouseout="hidewidget('persistent_vault');">
+									<instance name="persistant_vault_slot" slot="0" />
+									<instance name="persistant_vault_slot" slot="1" />
+									<instance name="persistant_vault_slot" slot="2" />
+									<instance name="persistant_vault_slot" slot="3" />
+									<instance name="persistant_vault_slot" slot="4" />
+								</panel>
+							
+
+	
+							
+							
+							</panel>
+							
+
+							
+						<panel  y="-20" width="96%" height="100" align="center" valign="bottom" noclick="true" color="invisible">
+							<frame style="lobby_window_bg" height="100%" color="0 0 0 .8"  noclick="true"></frame>
+							<frame style="lobby_window"   height="100%"   noclick="true"></frame>
+							
+							
+							<instance name="persistent_tip" id="0"/>
+							<instance name="persistent_tip" id="1"/>
+							<instance name="persistent_tip" id="2"/>
+							<instance name="persistent_tip" id="3"/>
+							<instance name="persistent_tip" id="4"/>
+							
+							
+						</panel>
+						
+						<button width="131"  height="121" valign="bottom" align="center" y="-125" color="invisible" onmouseover="showwidget('persistent_vault'); showwidget('persistent_vault_hightlight'); HideWidget('runebuilder');" onmouseout="ShowWidget('runebuilder');" onclick="ToggleRuneBuilder();">
+								<image name="runebuilderdown" align="center" width="131" height="121" texture="/ui/elements/rune_builder_mouseover.tga"/>
+								<image name="runebuilder" align="center" width="131" height="121" texture="/ui/elements/rune_builder.tga"/>
+						</button>
+				
+					</panel>
+				</panel>	
+				<panel  width="32.1%" color="invisible">			
+					<instance name="header_button" tag="tools" label="Attributes and Tools" image="/ui/elements/lvlup.tga"  lvlup="1 .4 0 1"/>
+					<panel name="tools" x="-260" y="26"  height="440" width="505" onmouseover="showwidget('tools'); showwidget('tools_hightlight'); " onmouseout="hidewidget('tools'); hidewidget('tools_hightlight');" color="invisible" visible="0">
+						<frame style="lobby_window_bg" height="100%"  borderthickness="8" color=".8 .3 0 1" noclick="true">
+							<image texture="/ui/elements/shrine_back_2.tga" color="1 1 1 .6" noclick="1"/>
+						</frame>
+						<frame style="lobby_window"   height="100%"  borderthickness="8"  noclick="true"></frame>
+						
+						<panel x="-10" y="10" align="right" width="30%" height="96%" noclick="1">
+							<frame style="lobby_window_bg" height="100%"  borderthickness="8" color="0 0 0 .8" noclick="true"></frame>
+							<frame style="lobby_window"   height="100%"  borderthickness="8"  noclick="true" float="bottom" padding="10">
+							<label y="27" width="100%" font="chat_12" color="yellow" shadow="true" watch="Gold" ontrigger="SetText('Your Gold: ' # FtoA(param, 0, 0, ','));" textalign="center" noclick="1">Your Gold: param</label>							
+							<label y="11" width="100%" font="chat_12" color="yellow" shadow="true" textalign="center" watch="TeamGold" ontrigger="SetText('Team Gold: ' # FtoA(param, 0, 0, ','));"  noclick="1">Team Gold: 2500</label>	
+							<anchor y="50" x="5%" />
+							<instance width="90%"  name="round_button2" height="20" font="chat_12" label="Donate 50 Gold" onmouseover="showwidget('tools'); showwidget('tools_hightlight'); " watch="Gold" ontrigger="SetEnabled(param >= 50);" onclick="Contribute(50);"/>
+							<instance width="90%"  name="round_button2" height="20" font="chat_12" label="Donate 100 Gold" onmouseover="showwidget('tools'); showwidget('tools_hightlight'); " watch="Gold" ontrigger="SetEnabled(param >= 100);" onclick="Contribute(100);"/>
+							<instance width="90%"  name="round_button2" height="20" font="chat_12" label="Donate 200 Gold" onmouseover="showwidget('tools'); showwidget('tools_hightlight'); " watch="Gold" ontrigger="SetEnabled(param >= 200);" onclick="Contribute(200);"/>
+							<instance width="90%"  name="round_button2" height="20" font="chat_12" label="Donate 500 Gold" onmouseover="showwidget('tools'); showwidget('tools_hightlight'); " watch="Gold" ontrigger="SetEnabled(param >= 500);" onclick="Contribute(500);"/>
+							<instance width="90%"  name="round_button2" height="20" font="chat_12" label="Donate ALL Gold" onmouseover="showwidget('tools'); showwidget('tools_hightlight'); " watch="Gold" ontrigger="CreateInt('_donateall', param);" onclick="Contribute(_donateall);"/>
+						 </frame>
+						</panel>
+						
+		
+						<panel x="10" y="10" width="64%" height="96%" noclick="1">
+							<frame style="lobby_window_bg" height="100%"  borderthickness="8" color="0 0 0 .8" noclick="true"></frame>
+							<frame style="lobby_window"   height="100%"  borderthickness="8"  noclick="true"></frame>
+							<!-- Attributes -->
+							<panel x="0" y="0" height="419" width="310" align="left" color="invisible" valign="top" noclick="1" >
+							
+		
+								<label x="-62" align="right" y="3" height="30" textalign="right" width="120" valign="top" textvalign="center" font="chat_14" shadow="true" color="white" noclick="1">Attribute Points:</label>
+								<panel y="6" valign="top" x="-10" width="40" height="25" align="right" color="invisible" noclick="1">
+									<frame texture="/ui/frames/rounded_bg_red.tga" borderthickness="8" color="white" noclick="1"/>
+									<frame texture="/ui/frames/roundframe.tga" borderthickness="8" color="#FF4500" noclick="1"/>
+									<label y="2" height="100%" valign="center" textalign="center" font="chat_16" shadow="true" watch="StatPoints" ontrigger="SetText(param);" noclick="1" color="white">55</label>
+								</panel>
+
+
+								<panel y="30" x="12" name="spend_points_panel" width="-20" height="60" float="bottom" padding="0" color="invisible" noclick="1">
+									<!-- Header -->
+									<panel width="350" height="34" float="right" padding="6" noclick="1">
+										<panel width="90" height="20" valign="center" noclick="1">
+											<frame texture="/ui/frames/rounded_bg_white.tga" borderthickness="6" color="white" noclick="1"/>
+											<frame texture="/ui/frames/roundframe.tga" color="gray" borderthickness="6" noclick="1"/>
+
+											<label textvalign="center" textalign="center" font="chat_12"  color="Black" noclick="1">Attribute</label>
+										</panel>
+										<panel width="50" height="20" valign="center" noclick="1">
+											<frame texture="/ui/frames/rounded_button_bg_white.tga" borderthickness="6" color="white" noclick="1"/>
+											<frame texture="/ui/frames/roundframe.tga" color="gray" borderthickness="6" noclick="1"/>
+
+											<label  textvalign="center" textalign="center" font="chat_12" color="black" noclick="1">Bonus</label>
+										</panel>
+										<panel width="33" height="20" valign="center" noclick="1">
+											<frame  texture="/ui/frames/rounded_button_bg_white.tga" borderthickness="6" color="white" noclick="1"/>
+											<frame  texture="/ui/frames/roundframe.tga" color="gray" borderthickness="6" noclick="1"/>
+
+											<label  textvalign="center" textalign="center" font="chat_12" color="black" noclick="1">Cost</label>
+										</panel>
+										<panel width="27" height="20" valign="center" noclick="1">
+											<frame texture="/ui/frames/rounded_button_bg_white.tga" borderthickness="6" color="white" noclick="1"/>
+											<frame texture="/ui/frames/roundframe.tga" color="gray" borderthickness="6" noclick="1"/>
+
+											<label textvalign="center" textalign="center" font="chat_12" color="black" noclick="1">Lvl</label>
+										</panel>
+										<panel width="24" height="32" valign="center" noclick="1"/>
+										<panel width="45" height="20" valign="center" noclick="1">
+											<frame texture="/ui/frames/rounded_button_bg_white.tga" borderthickness="6"  noclick="1" color="white"/>
+											<frame texture="/ui/frames/roundframe.tga" color="gray" borderthickness="6" noclick="1"/>
+											<label textvalign="center" textalign="center" font="chat_12" color="Black" noclick="1">Effect</label>
+										</panel>
+									</panel>
+									
+									<panel y="-30" x="-12"  name="wtf" noclick="1" color="invisible"/>
+									<!-- Stats -->
+									<anchor y="30" x="0" noclick="1"/>
+									<instance name="player_stat2" index="1" desc="After surviving many trials and tribulations, it becomes natural to ignore pain and fatigue, increasing your health and health regeneration."/>
+									<instance name="player_stat2" index="2" desc="With every battle comes the knowledge to increase your mana, mana regeneration and predict your opponent's moves, reducing the damage and duration of harmful spells and skills."/>
+									<instance name="player_stat2" index="3" desc="With proper training, any being can be taught to make every motion easier and more effective. This training increases your stamina and stamina regeneration."/>
+									<instance name="player_stat2" index="4" desc="Even the hardiest warrior will fall without his weapon, and those that realize that train to improve their strength, improving their melee damage."/>
+								</panel>
+							</panel>
+								
+
+						</panel>
+						
+						
+						
+					</panel>
+					
+					
+					
+					
+					
+				</panel>				
+			</panel>	
+			<!-- END HEADER BUTTONS -->
+						
+		
+		</panel>		
+		<!-- END RIGHT COLUMN-->
+		
+		<panel name="spawn_queue" color="invisible" visible="false" onload="CreateInt('_spawn_queue_pos', 0); CreateInt('_spawn_queue_size', 0);" watch1="TeamQueuePosition" ontrigger1="SetVisible(param > 0);">
+			<panel  align="center" valign="center" width="400" height="290" noclick="true"  visible="true">
+				<panel y="22" valign="top" height="-62" texture="/ui/elements/parchment.tga" color="#FFFFFFFF"/>
+				<frame style="lobby_window_bg" texture="/ui/frames/rounded_bg_white.tga" borderthickness="12"/>
+				<frame style="lobby_window"  texture="/ui/frames/roundframe.tga"  borderthickness="12"/>
+				<frame style="lobby_window_header_bg" texture="/ui/frames/rounded_header_bg_white.tga" height="26"  borderthickness="12"/>
+				<frame style="lobby_window_header" texture="/ui/frames/roundframe_header.tga" height="26" borderthickness="12"/>
+				<label x="10" height="24" width="100%" textalign="left" textvalign="center" align="left" font="chat_12" color="yellow" shadow="true">Spawn Queue</label>
+				<label x="-10" height="24" width="100%" textalign="right" textvalign="center" align="right" font="chat_12" color="yellow" shadow="true"></label>				
+				<panel y="38" height="24"  width="80%" color="invisible" align="center">
+					<frame color="#00000099" texture="/ui/frames/rounded_bg_white.tga" borderthickness="6"/>
+					<frame style="lobby_window"  texture="/ui/frames/roundframe.tga"  borderthickness="6"/>					
+					<label  height="100%"  width="100%" textalign="center" textvalign="center" align="right" font="chat_14" color="red" shadow="true">Your team has too many players!</label>				
+				</panel>
+				<label x="10" y="60"  height="44" width="95%" textalign="left" textvalign="center" align="left" wrap="true" font="chat_12" color="white" shadow="true" watch1="TeamQueuePosition" ontrigger1="Set('_spawn_queue_pos', param);" watch2="TeamQueueSize" ontrigger2="Set('_spawn_queue_size', param);" watch3="TeamQueuePosition TeamQueueSize" ontrigger3="SetText('You are currently ^090' # _spawn_queue_pos # ' of ' # _spawn_queue_size # '^* players waiting to spawn in the queue. You will be able to spawn when enough players on your team are dead.');"/>				
+				<label x="10" y="112"  height="44" width="95%" textalign="left" textvalign="center" align="left" wrap="true" font="chat_11" color="white" shadow="true">The spawn queue maintains an even player count between teams when they become unbalanced. Rather than forcing players to join the other team against their will, the spawn queue balances the game while giving players the option to switch teams. </label>				
+				<label x="10" y="183"  height="44" width="95%" textalign="left" textvalign="center" align="left" wrap="true" font="chat_12" color="white" shadow="true">If you do not wish to wait simply click the switch teams button. ^090Doing so grants bonus experience and an automatic win!</label>												
+				<frame style="lobby_window_footer_bg" valign="bottom" texture="/ui/frames/rounded_footer_bg_white.tga" height="46" borderthickness="12"/>
+				<frame style="lobby_window_footer" valign="bottom" texture="/ui/frames/roundframe_footer.tga" height="46" borderthickness="12">		
+				
+				<instance
+					name="round_button2"					
+					valign="center" 
+					align="center"
+					width="190" height="28"
+					font="chat_12"
+					label=" Switch Teams  (No waiting) "
+					ontrigger=""
+					onclick="JoinOpposingTeam();"
+				/>	
+				</frame>					
+			</panel>						
+		</panel>
+		
+		<instance name="game_chat_window" interface="game_loadout" xoffset="10" yoffset="-35" bufferwidth="700" entrywidth="700" bufferheight="80"/>
+		
+		
+		<panel name="stat_points_msg" color="#00000099" visible="0" noclick="false" onload="CreateBool('_showstats', false); CreateBool('_disablestats', false);" watch="StatPoints" ontrigger="SetVisible(param > 0 and !IsDemoAccount() and _showstats and !_disablestats);">
+			
+				<!-- Attributes -->
+				<panel x="20" y="20" height="589" width="320" align="center" valign="center">
+					<panel y="22" valign="top" height="-62" texture="/ui/elements/parchment.tga" color="#FFFFFFFF"/>
+					<frame style="lobby_window_bg" texture="/ui/frames/rounded_bg_white.tga" borderthickness="12"/>
+					<frame style="lobby_window"  texture="/ui/frames/roundframe.tga"  borderthickness="12"/>
+					<frame style="lobby_window_header_bg" texture="/ui/frames/rounded_header_bg_white.tga" height="26"  borderthickness="12"/>
+					<frame style="lobby_window_header" texture="/ui/frames/roundframe_header.tga" height="26" borderthickness="12"/>
+					<frame style="lobby_window_footer_bg" x="0" valign="bottom" texture="/ui/frames/rounded_footer_bg_white.tga" height="50" borderthickness="12"/>
+					<frame style="lobby_window_footer" x="0" valign="bottom" texture="/ui/frames/roundframe_footer.tga" height="50" borderthickness="12">
+						<!-- Spendable points -->
+						<panel x="-10" width="-150" align="right" valign="center" color="invisible" height="40">
+		
+
+							<label x="22" y="-2" height="100%" textalign="left" valign="center" textvalign="center" font="chat_12" shadow="true" watch="" color="#FF4500" >Attribute Points:</label>
+							<panel y="0" valign="center" x="-10" width="40" height="25" align="right" noclick="1">
+								<frame texture="/ui/frames/rounded_bg_red.tga" borderthickness="8" color="white"/>
+								<frame texture="/ui/frames/roundframe.tga" borderthickness="8" color="#FF4500"/>
+								<label y="2" height="100%" valign="center" textalign="center" font="chat_16" shadow="true" watch="StatPoints" ontrigger="SetText(param);" color="white">55</label>
+							</panel>
+						</panel>
+						
+						<!--<instance
+							name="round_button2"					
+							x="10"
+							valign="center" 					
+							width="110" height="28"
+							font="chat_12"
+							label="Spend Later"
+							ontrigger=""
+							onclick="hidewidget('stat_points_msg');"			
+						/>	-->
+						<instance
+							name="round_button2"					
+							x="10"
+							valign="center" 					
+							width="140" height="28"
+							font="chat_12"
+							label="Disable This Popup"
+							ontrigger=""
+							onclick="hidewidget('stat_points_msg'); Set('_disablestats', true);"			
+						/>
+						
+					</frame>
+				<button x="-12" y="7" width="14" height="14" align="right" color="#FFFFFF99" onclick="hidewidget('stat_points_msg'); Set('_showstats', false);" texture="/ui/elements/xbutton.tga"></button>
+				
+				<panel y="29" height="112"  width="95%" color="invisible" align="center">
+					<frame color="#00000099" texture="/ui/frames/rounded_bg_white.tga" borderthickness="6"/>
+					<frame style="lobby_window"  texture="/ui/frames/roundframe.tga"  borderthickness="6"/>					
+					<label  height="100%"  y="8" width="100%" textalign="center" textvalign="top" align="right" font="chat_12" color="red" shadow="true">You have Attribute Points to spend!</label>		
+
+
+					<label x="10" y="32"  height="64" width="90%" textalign="left" textvalign="top" align="center" wrap="true" font="chat_11" color="white" shadow="true">You have Leveled UP. When you level up you gain Attribute Points which you can spend on various attributes such as health pool, health regen, damage, armor etc. You have unspent points would you like to spend them now? </label>									
+				</panel>
+				
+				
+									
+					
+					<label x="10" height="24" textalign="left" textvalign="center" align="left" font="chat_14" color="white" shadow="true">Attributes</label>
+
+					<panel y="140" x="12" name="spend_points_panel"  float="bottom" padding="0" color="invisible"  noclick="1">
+						<!-- Header -->
+						<panel width="350" height="34" float="right" padding="6">
+							<panel width="90" height="20" valign="center" >
+								<frame texture="/ui/frames/rounded_bg_white.tga" borderthickness="8" color="white"/>
+								<frame texture="/ui/frames/roundframe.tga" color="gray" borderthickness="8"/>
+
+								<label textvalign="center" textalign="center" font="chat_12" color="Black">Attribute</label>
+							</panel>
+							<panel width="50" height="20" valign="center">
+								<frame texture="/ui/frames/rounded_button_bg_white.tga" borderthickness="8" color="white"/>
+								<frame texture="/ui/frames/roundframe.tga" color="gray" borderthickness="8"/>
+
+								<label  textvalign="center" textalign="center" font="chat_12" color="black">Bonus</label>
+							</panel>
+							<panel width="33" height="20" valign="center">
+								<frame  texture="/ui/frames/rounded_button_bg_white.tga" borderthickness="8" color="white"/>
+								<frame  texture="/ui/frames/roundframe.tga" color="gray" borderthickness="8"/>
+
+								<label  textvalign="center" textalign="center" font="chat_12" color="black">Cost</label>
+							</panel>
+							<panel width="27" height="20" valign="center">
+								<frame texture="/ui/frames/rounded_button_bg_white.tga" borderthickness="8" color="white"/>
+								<frame texture="/ui/frames/roundframe.tga" color="gray" borderthickness="8"/>
+
+								<label textvalign="center" textalign="center" font="chat_12" color="black">Lvl</label>
+							</panel>
+							<panel width="24" height="32" valign="center"/>
+							<panel width="45" height="20" valign="center">
+								<frame texture="/ui/frames/rounded_button_bg_white.tga" borderthickness="8" color="white"/>
+								<frame texture="/ui/frames/roundframe.tga" color="gray" borderthickness="8"/>
+								<label textvalign="center" textalign="center" font="chat_12" color="Black">Effect</label>
+							</panel>
+						</panel>
+						
+						<!-- Stats -->
+						<instance name="player_stat3" index="1" desc="After surviving many trials and tribulations, it becomes natural to ignore pain and fatigue, increasing your health and health regeneration."/>
+						<instance name="player_stat3" index="2" desc="With every battle comes the knowledge to increase your mana, mana regeneration and predict your opponent's moves, reducing the damage and duration of harmful spells and skills."/>
+						<instance name="player_stat3" index="3" desc="With proper training, any being can be taught to make every motion easier and more effective. This training increases your stamina and stamina regeneration."/>
+						<instance name="player_stat3" index="4" desc="Even the hardiest warrior will fall without his weapon, and those that realize that train to improve their strength, improving their melee damage."/>
+					</panel>
+				</panel>
+
+		</panel>		
+		
+		
+		
+		
+		
+		
+		<panel name="free_account_inventory" noclick="true" align="center" valign="center" x="-35" y="20"   height="560" width="400" visible="false"> 
+			<instance name="demo_nag" showpurchase="false"/>
+			<panel x="110%" y="57%" width="250" height="55">
+				<frame x="0" texture="/ui/frames/rounded_bg_white.tga" borderthickness="12" color="#00ccFF88"/>
+				<frame x="0" texture="/ui/frames/roundframe.tga" borderthickness="12" color="yellow"/>
+				<frame y="4" height="47" align="center" width="-20" texture="/ui/frames/rounded_button_bg_white.tga" borderthickness="4" color="#00000077"/>
+				<frame y="4" height="47" align="center" width="-20" texture="/ui/frames/roundframe.tga" borderthickness="4" color="yellow"/>
+				<label noclick="1" y="-39" width="90%" height="100" textvalign="center" textalign="center" valign="top" align="center" wrap="true" font="chat_12" color="white" shadow="true">Click on the padlock to upgrade your account instantly, unlocking these inventory slots!</label>
+			</panel>
+			<image x="110%" y="60%"  width="128" height="128" texture="/ui/elements/big_arrow.tga"/>
+		</panel>
+		
+		<panel name="demo_attribute_tip" noclick="true" align="left" valign="center" x="70" y="20" height="560" width="400" visible="0"> 
+			<instance name="demo_nag" showpurchase="false"/>			
+		</panel>		
+		
+		
+	</panel>
+	
+	
+	
+	
+	
+</interface>
