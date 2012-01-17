@@ -1,0 +1,286 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<interface name="game_menu">
+	<!-- Fonts -->
+	<include file="fonts.xml"/>
+	<include file="inc_button.xml"/>
+
+		<!-- Window styles -->
+	
+	<style name="lobby_window_header_bg" texture="/ui/frames/rounded_header_bg_white.tga" height="26" color="#2E1F00" borderthickness="12"/>
+	<style name="lobby_window_header" texture="/ui/frames/roundframe_header.tga" height="26" color="#5E2D1F" borderthickness="12"/>
+	<style name="lobby_window_header_label" width="-20" align="center" textvalign="center" font="chat_14" color="white" shadow="true"/>
+	<style name="lobby_window_bg" texture="/ui/frames/rounded_bg_white.tga" borderthickness="12" color="#2E1F0055"/>
+	<style name="lobby_window" texture="/ui/frames/roundframe.tga" color="#5E2D1F" borderthickness="12"/>
+	<style name="lobby_window_footer_bg" valign="bottom" texture="/ui/frames/rounded_footer_bg_white.tga" height="35" color="#2E1F00" borderthickness="12"/>
+	<style name="lobby_window_footer" valign="bottom" texture="/ui/frames/roundframe_footer.tga" height="35" color="#5E2D1F" borderthickness="12"/>
+	
+	<!-- Background -->
+	<panel name="background" color="#00000080"/>
+	
+	<!-- Main panel -->
+	<panel width="250" height="458" align="center" valign="center">
+		<panel  y="-2" valign="center" height="-45" texture="/ui/elements/parchment.tga"/>
+
+		<frame texture="/ui/frames/rounded_bg_white.tga" borderthickness="12" style="lobby_window_bg"/>
+		<frame texture="/ui/frames/roundframe.tga" color="#5E2D1F" borderthickness="12"/>
+		<frame texture="/ui/frames/rounded_header_bg_white.tga" height="26" style="lobby_window_header_bg" borderthickness="12"/>
+		<frame texture="/ui/frames/roundframe_header.tga" height="26" style="lobby_window_header" borderthickness="12"/>
+
+		<frame valign="bottom" texture="/ui/frames/rounded_footer_bg_white.tga" height="50" style="lobby_window_header_bg" borderthickness="12"/>
+		<frame valign="bottom" texture="/ui/frames/roundframe_footer.tga" height="50" style="lobby_window_header" borderthickness="12"/>
+
+		<label width="-20" height="24" textvalign="center" align="center" font="chat_14" color="white" shadow="true">Game Menu</label>
+		<button x="-12" y="7"  width="14" height="14" align="right" color="#FFFFFF99" texture="/ui/elements/xbutton.tga" onclick="ToggleMenu();"/>
+
+		<image y="20" name="logo" align="center" width="250" height="120" sticky="true" texture="/ui/elements/logo.tga"/>			
+
+		<panel y="145" width="140" align="center" height="239" padding="10" float="bottom">
+		
+			<frame y="0" texture="/ui/frames/rounded_bg_white.tga" borderthickness="12" style="lobby_window_bg"/>
+			<frame y="0" texture="/ui/frames/roundframe.tga" color="#5E2D1F" borderthickness="12"/>
+		
+			<panel y="5" height="28" width="130" align="center" color="invisible">
+				<instance name="round_button2" width="130" height="28" valign="center" align="center" font="gametweener" label="Return To Game" onclick="ToggleMenu();"/>
+			</panel>
+
+			<panel height="28" width="130" align="center" color="invisible">
+				<instance name="round_button2" width="130" height="28" valign="center" align="center" font="gametweener" label="Game Lobby" onclick="ToggleLobby();"/>
+			</panel>				
+			
+			<panel height="28" width="130" align="center" color="invisible">
+				<instance name="round_button2" width="130" height="28" valign="center" align="center" font="gametweener" label="Options" onclick="Exec('/scripts/slide.cfg');"/>
+			</panel>
+			
+			<panel height="28" width="130" align="center" color="invisible">
+				<instance name="round_button2" width="130" height="28" valign="center" align="center" font="gametweener" label="Vote" onclick="ShowWidget('vote_panel');"/>
+			</panel>
+			
+			<panel height="28" width="130" align="center" color="invisible">
+				<instance name="round_button2" width="130" height="28" valign="center" align="center" font="gametweener" label="Disconnect" onclick="ShowWidget('disconnect_confirm');"/>
+			</panel>
+
+			<panel height="28" width="130" align="center" color="invisible">
+				<instance name="round_button2" width="130" height="28" valign="center" align="center" font="gametweener" label="Quit" onclick="ShowWidget('quit_confirm');"/>
+			</panel>
+		</panel>
+	</panel>
+
+		
+	<!-- Main panel -->
+	<panel width="250" height="458" align="center" valign="center" watch="DemoAccount" ontrigger="SetVisible(param);">
+		<panel  y="-2" valign="center" height="-45" texture="/ui/elements/parchment.tga"/>
+
+		<frame texture="/ui/frames/rounded_bg_white.tga" borderthickness="12" style="lobby_window_bg"/>
+		<frame texture="/ui/frames/roundframe.tga" color="#5E2D1F" borderthickness="12"/>
+		<frame texture="/ui/frames/rounded_header_bg_white.tga" height="26" style="lobby_window_header_bg" borderthickness="12"/>
+		<frame texture="/ui/frames/roundframe_header.tga" height="26" style="lobby_window_header" borderthickness="12"/>
+
+		<frame valign="bottom" texture="/ui/frames/rounded_footer_bg_white.tga" height="50" style="lobby_window_header_bg" borderthickness="12"/>
+		<frame valign="bottom" texture="/ui/frames/roundframe_footer.tga" height="50" style="lobby_window_header" borderthickness="12"/>
+		<panel y="-2%" height="36" width="202" align="center" valign="bottom" watch="DemoAccount" ontrigger="SetVisible(param)" color="invisible">
+			<instance name="round_button2" width="190" height="28" valign="center" align="center" font="gametweener" label="Upgrade Account" onclick="TogglePurchase(); ToggleMenu();"/>
+		</panel>
+
+		<label width="-20" height="24" textvalign="center" align="center" font="chat_14" color="white" shadow="true">Game Menu</label>
+		<button x="-12" y="7"  width="14" height="14" align="right" color="#FFFFFF99" texture="/ui/elements/xbutton.tga" onclick="ToggleMenu();"/>
+
+		<image y="12" name="logo" align="center" width="250" height="120" sticky="true" texture="/ui/elements/logo.tga"/>			
+
+		<panel y="125" width="140" align="center" height="239" padding="10" float="bottom">
+		
+			<frame y="0" texture="/ui/frames/rounded_bg_white.tga" borderthickness="12" style="lobby_window_bg"/>
+			<frame y="0" texture="/ui/frames/roundframe.tga" color="#5E2D1F" borderthickness="12"/>
+		
+			<panel y="5" height="28" width="130" align="center" color="invisible">
+				<instance name="round_button2" width="130" height="28" valign="center" align="center" font="gametweener" label="Return To Game" onclick="ToggleMenu();"/>
+			</panel>
+
+			<panel height="28" width="130" align="center" color="invisible">
+				<instance name="round_button2" width="130" height="28" valign="center" align="center" font="gametweener" label="Game Lobby" onclick="ToggleLobby();"/>
+			</panel>				
+			
+			<panel height="28" width="130" align="center" color="invisible">
+				<instance name="round_button2" width="130" height="28" valign="center" align="center" font="gametweener" label="Options" onclick="Exec('/scripts/slide.cfg');"/>
+			</panel>
+			
+			<panel height="28" width="130" align="center" color="invisible">
+				<instance name="round_button2" width="130" height="28" valign="center" align="center" font="gametweener" label="Vote" onclick="ShowWidget('vote_panel');"/>
+			</panel>
+			
+			<panel height="28" width="130" align="center" color="invisible">
+				<instance name="round_button2" width="130" height="28" valign="center" align="center" font="gametweener" label="Disconnect" onclick="ShowWidget('disconnect_confirm');"/>
+			</panel>
+
+			<panel height="28" width="130" align="center" color="invisible">
+				<instance name="round_button2" width="130" height="28" valign="center" align="center" font="gametweener" label="Quit" onclick="ShowWidget('quit_confirm');"/>
+			</panel>
+		</panel>
+		
+
+			
+	</panel>	
+	
+	<!-- confirm disconnect -->
+	<panel color="#000000cc" name="disconnect_confirm" visible="false">		
+		<panel width="300" height="250" align="center" valign="center" >	
+			<panel  y="-2" valign="center" height="-45" texture="/ui/elements/parchment.tga"/>
+
+			<frame texture="/ui/frames/rounded_bg_white.tga" borderthickness="12" style="lobby_window_bg"/>
+			<frame texture="/ui/frames/roundframe.tga" color="#5E2D1F" borderthickness="12"/>
+			<frame texture="/ui/frames/rounded_header_bg_white.tga" height="26" style="lobby_window_header_bg" borderthickness="12"/>
+			<frame texture="/ui/frames/roundframe_header.tga" height="26" style="lobby_window_header" borderthickness="12"/>
+
+			<frame valign="bottom" texture="/ui/frames/rounded_footer_bg_white.tga" height="50" style="lobby_window_header_bg" borderthickness="12"/>
+			<frame valign="bottom" texture="/ui/frames/roundframe_footer.tga" height="50" style="lobby_window_header" borderthickness="12">
+
+			<panel y="0" height="28" valign="center" align="center" width="-30" >
+				<panel height="28" width="80" align="left" color="invisible">
+					<instance name="round_button2" width="80" height="28" valign="center" align="center" font="gametweener" label="No" onclick="HideWidget('disconnect_confirm');"/>
+				</panel>
+				
+				<panel  height="28" width="80" align="right" color="invisible">
+					<instance name="round_button2" width="80" height="28" valign="center" align="center" font="gametweener" label="Yes" onclick="HideWidget('disconnect_confirm'); Disconnect(); If(IsLoggedIn(), SetHostInterface('browser'), SetHostInterface('main'));"/>
+				</panel>				
+			</panel>			
+			</frame>
+			
+			<panel  y="34" width="-10" height="50" align="center" color="invisible">
+				<label width="-20" height="24" textalign="center" textvalign="center" align="center" font="chat_12" wrap="true" color="white" shadow="true">Are you sure you want to disconnect?</label>
+			</panel>
+			
+			<panel  y="65" width="-30" height="50" align="center" color="invisible">
+				<label  height="24" width="100%" textvalign="center" textalign="center" align="center" font="chat_14" wrap="true" color="red" shadow="true">Warning!!!</label>
+			</panel>
+			
+			<panel  y="65" width="-30" height="50" align="center" color="invisible">
+				<label  height="84" width="100%" textvalign="center" textalign="center" align="center" font="chat_12" wrap="true" color="white" shadow="true">If you leave before the game is finished you will not recieve the 10 experience point per minute bonus and you will lose any automatic wins you recieved.</label>
+				
+			</panel>			
+			
+			<label width="-20" height="24" textvalign="center" align="center" font="chat_14" color="white" shadow="true">Confirm</label>
+			<button x="-12" y="7"  width="14" height="14" align="right" color="#FFFFFF99" texture="/ui/elements/xbutton.tga" onclick="PlaySound('/shared/sounds/ui/button_close.mp3'); HideWidget('disconnect_confirm');"/>
+
+		</panel>
+	</panel>	
+	
+	<!-- confirm quit -->
+	<panel color="#000000cc" name="quit_confirm" visible="false" blockinput="true">		
+		<panel width="300" height="250" align="center" valign="center">
+			<panel y="-2" valign="center" height="-45" texture="/ui/elements/parchment.tga"/>
+		
+			<frame texture="/ui/frames/rounded_bg_white.tga" borderthickness="12" style="lobby_window_bg"/>
+			<frame texture="/ui/frames/roundframe.tga"  color="#5E2D1F" borderthickness="12"/>
+			<frame texture="/ui/frames/rounded_header_bg_white.tga" height="26" style="lobby_window_header_bg" borderthickness="12"/>
+			<frame texture="/ui/frames/roundframe_header.tga" height="26" style="lobby_window_header" borderthickness="12"/>
+
+			<frame valign="bottom" texture="/ui/frames/rounded_footer_bg_white.tga" height="50" style="lobby_window_header_bg" borderthickness="12"/>
+			<frame valign="bottom" texture="/ui/frames/roundframe_footer.tga" height="50" style="lobby_window_header" borderthickness="12">
+
+			<panel y="0" height="28" valign="center" align="center" width="-30" >
+				<panel height="28" width="80" align="left" color="invisible">
+					<instance name="round_button2" width="80" height="28" valign="center" align="center" font="gametweener" label="No" onclick="HideWidget('quit_confirm');"/>
+				</panel>
+				
+				<panel  height="28" width="80" align="right" color="invisible">
+					<instance name="round_button2" width="80" height="28" valign="center" align="center" font="gametweener" label="Yes" onclick="Quit();"/>
+				</panel>				
+			</panel>		
+			
+			</frame> <!-- frame footer -->
+			
+			<panel  y="34" width="-10" height="50" align="center" color="invisible">
+				<label width="-20" height="24" textalign="center" textvalign="center" align="center" font="chat_12" wrap="true" color="white" shadow="true">Are you sure you want to quit?</label>
+			</panel>
+			
+			<panel  y="65" width="-30" height="50" align="center" color="invisible">
+				<label  height="24" width="100%" textvalign="center" textalign="center" align="center" font="chat_14" wrap="true" color="red" shadow="true">Warning!!!</label>
+			</panel>
+			
+			<panel  y="65" width="-30" height="50" align="center" color="invisible">
+				<label  height="84" width="100%" textvalign="center" textalign="center" align="center" font="chat_12" wrap="true" color="white" shadow="true">If you leave before the game is finished you will not recieve the 10 experience point per minute bonus and you will lose any automatic wins you recieved.</label>
+			</panel>			
+			
+			<label width="-20" height="24" textvalign="center" align="center" font="chat_14" color="white" shadow="true">Confirm</label>
+			<button x="-12" y="7"  width="14" height="14" align="right" color="#FFFFFF99" texture="/ui/elements/xbutton.tga" onclick="PlaySound('/shared/sounds/ui/button_close.mp3'); HideWidget('disconnect_confirm');"/>
+
+			
+			<label width="-20" height="24" textvalign="center" align="center" font="chat_14" color="white" shadow="true">Confirm</label>
+			<button x="-12" y="7"  width="14" height="14" align="right" color="#FFFFFF99" texture="/ui/elements/xbutton.tga" onclick="PlaySound('/shared/sounds/ui/button_close.mp3'); HideWidget('quit_confirm');"/>
+
+		</panel>
+	</panel>
+	
+	<!-- Vote -->
+	<panel name="vote_panel" color="#00000080" visible="false">
+		<!-- Main panel -->
+		<panel width="450" height="658" align="center" valign="center">
+			<panel  y="-2" valign="center" height="-45" texture="/ui/elements/parchment.tga"/>
+
+			<frame texture="/ui/frames/rounded_bg_white.tga" borderthickness="12" style="lobby_window_bg"/>
+			<frame texture="/ui/frames/roundframe.tga" color="#5E2D1F" borderthickness="12"/>
+			<frame texture="/ui/frames/rounded_header_bg_white.tga" height="26" style="lobby_window_header_bg" borderthickness="12"/>
+			<frame texture="/ui/frames/roundframe_header.tga" height="26" style="lobby_window_header" borderthickness="12"/>
+
+			<frame valign="bottom" texture="/ui/frames/rounded_footer_bg_white.tga" height="50" style="lobby_window_header_bg" borderthickness="12"/>
+			<frame valign="bottom" texture="/ui/frames/roundframe_footer.tga" height="50" style="lobby_window_header" borderthickness="12"/>
+
+			<label width="-20" height="24" textvalign="center" align="center" font="chat_14" color="white" shadow="true">Vote System</label>
+			<button x="-12" y="7"  width="14" height="14" align="right" color="#FFFFFF99" texture="/ui/elements/xbutton.tga" onclick="HideWidget('vote_panel');"/>
+
+			<image y="20" name="logo" align="center" width="250" height="120" sticky="true" texture="/ui/elements/logo.tga"/>			
+
+			<panel y="140" width="400" align="center" height="425" padding="65" float="bottom" onframe="">
+
+				<frame y="0" texture="/ui/frames/rounded_bg_white.tga" borderthickness="12" style="lobby_window_bg"/>
+				<frame y="0" texture="/ui/frames/roundframe.tga" color="#5E2D1F" borderthickness="12"/>
+				
+				<!-- Connect Code: ./game_browser.xml: <button color="invisible" onclick="PlaySound('/shared/sounds/ui/button_click.mp3'); HideWidget('connect_to_ip'); Disconnect(); Connect(_target_ip);"/> -->
+				<panel y="5" height="28" width="390" align="center" color="invisible" float="bottom" padding="20">
+					<instance name="round_button2" button_name="vote_impeach" width="170" height="28" valign="center" align="center" font="gametweener" label="%Spell_HailStorm_AnimName%" onclick="Connect(Spell_HailStorm_CursorPath);"/>
+					<label y="40" height="70" align="center" color="white" font="chat_12" width="390" wrap="true">%Spell_HailStorm_CastEffectPath%</label>
+					<label y="140" height="70" align="center" color="white" font="chat_12" width="390" wrap="true">Min Players: %Spell_HailStorm_AmmoCount%</label>
+					<label y="156" height="70" align="center" color="white" font="chat_12" width="390" wrap="true">Max Players: %Spell_HailStorm_AnimChannel%</label>
+					<label y="172" height="70" align="center" color="white" font="chat_12" width="390" wrap="true">Current: %Spell_HailStorm_CastTime%</label>
+					<label y="188" height="70" align="center" color="white" font="chat_12" width="390" wrap="true">Ip: %Spell_HailStorm_CursorPath%</label>
+
+				</panel>
+
+				<!--
+				<panel y="5" height="28" width="390" align="center" color="invisible">
+					<instance name="round_button2" button_name="vote_impeach" width="170" height="28" valign="center" align="center" font="gametweener" label="Impeach Commander" onclick="StartVote(0);"/>
+					<label y="40" height="70" align="center" color="white" font="chat_12" width="390" wrap="true">Calls a vote to remove current commander. You may only call this vote once per match.</label>
+				</panel>
+
+				<panel height="28" width="390" align="center" color="invisible">
+					<instance name="round_button2" button_name="vote_concede" width="170" height="28" valign="center" align="center" font="gametweener" label="Concede Match" onclick="StartVote(1);"/>
+					<label y="40" height="70" align="center" color="white" font="chat_12" width="390" wrap="true">Calls a vote to concede the match. You cannot cast this vote within the first 5 minutes of the match. This vote can only be called when your team is not meeting upkeep.</label>
+				</panel>
+
+				<panel height="28" width="390" align="center" color="invisible">
+					<instance name="round_button2" button_name="vote_shuffle" width="170" height="28" valign="center" align="center" font="gametweener" label="Vote Shuffle" onclick="StartVote(2);"/>
+					<label y="40" height="70" align="center" color="white" font="chat_12" width="390" wrap="true">Calls a vote to shuffle the teams based on skill factor. You may only call this vote once per match and within the first 5 minutes. If this vote passes the match will restart.</label>
+				</panel>				
+
+				<panel height="28" width="390" align="center" color="invisible">
+					<instance name="round_button2" button_name="vote_nextmap" width="170" height="28" valign="center" align="center" font="gametweener" label="Vote Next Map" onclick="StartVote(3);"/>
+					<label y="40" height="70" align="center" color="white" font="chat_12" width="390" wrap="true">Calls a vote to switch to the next map. This vote can only be cast within the first 5 minutes of a match or during warmup.</label>
+				</panel>
+
+				<panel height="28" width="170" align="center" color="invisible">
+					<instance name="round_button2" width="170" height="28" valign="center" align="center" font="gametweener" label="Return to Menu" onclick="HideWidget('vote_panel');"/>
+				</panel>
+				-->
+			</panel>
+		</panel>
+	</panel>
+
+	<panel x="214" y="39"  noclick="true">
+		<include file="/ui/game_voicecommands.xml"/>
+	</panel>
+
+	
+	<!-- Options panel -->
+	<include file="/ui/game_options.xml"/>	
+	
+	
+</interface>
