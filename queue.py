@@ -95,11 +95,6 @@ class queue(ConsolePlugin):
 			#modleave = re.match("leaveMod (\S+)", message, flags=re.IGNORECASE)
 			modleave = re.match("leaveMod", message, flags=re.IGNORECASE)																
 
-			test_startgame = re.match("startgame", message, flags=re.IGNORECASE)																
-
-			if test_startgame:				
-				kwargs['Broadcast'].broadcast('startgame')
-
 			if modinfo:
 				print "Modinfo: " + modinfo.group(1)
 				#client = self.getPlayerByName(name)
