@@ -76,6 +76,7 @@ class queue(ConsolePlugin):
 			if (queue.resetUpdate == 0):
 				self.updateModPlayers()
 				self.updateModPlayersGameVars(**kwargs)
+				self.checkModTreshold(**kwargs)
 
 
 	def onMessage(self, *args, **kwargs):
@@ -94,8 +95,12 @@ class queue(ConsolePlugin):
 			#modleave = re.match("leaveMod (\S+)", message, flags=re.IGNORECASE)
 			modleave = re.match("leaveMod", message, flags=re.IGNORECASE)																
 
+			test_startgame = re.match("startgame", message, flags=re.IGNORECASE)																
+
+			if test_startgame:				
+				kwargs['Broadcast'].broadcast('startgame')
+
 			if modinfo:
-				kwargs['Broadcast'].broadcast('Startgame')
 				print "Modinfo: " + modinfo.group(1)
 				#client = self.getPlayerByName(name)
 				modnumber = int (modinfo.group(1))
@@ -131,7 +136,29 @@ class queue(ConsolePlugin):
 			kwargs['Broadcast'].broadcast("Set " + queue.modVars[i][5] + " " + queue.modlist[i][5])	
 			i=i+1
 
-	
+	# we loop through players. we check for each player which mod he wants to join. if the mod has enough (waiting) players connect to the server in inner loop 
+	def checkModTreshold(self, *args, **kwargs):
+		print "In checkModTreshold\n" ;
+		for player in queue.playerlist:
+			print player
+			print "\n"
+			if( len(player['mod']) > 0): #player has joined a mod
+				print "Player joined a mod. Its: " + player['mod'] +". Now we should see the mod iteration\n"
+				for mod in queue.modlist:
+					print "In Mod Iteration\n"
+					print mod[0]
+					print "We should saw mod. If: " + mod[0] + " == " + player['mod'] + "\n"
+					#name desc minplayers maxplayers ip currentPlayers
+					if(mod[0] == player['mod']):
+						print "In if: " + mod[2] + " <= " + mod[5] + "\n"
+						if(mod[2] <= mod[5]):
+							print "ClientExecScript "+player['clinum']+" clientdo cmd \"Connect " + mod[4] + "\""
+							kwargs['Broadcast'].broadcast("ClientExecScript "+player['clinum']+" clientdo cmd \"Connect " + mod[4] + "\"")
+							break #break not return. we want to go to the next player not to leave the whole function and skip players
+						else:
+							break; #we will stop looking for matching mods for this player if found the matching one
+				
+
 	def updateModPlayers(self):
 		for i in range (0, len(queue.modlist)-1):
 			params = urllib.urlencode({'command':'countPlayersForMod','access_verifier':'ILoveJaredAndRoot', 'mod':queue.modlist[i][0]})
@@ -156,17 +183,33 @@ class queue(ConsolePlugin):
 		client = self.getPlayerByClientNum(cli)
 		client['active'] = False
 		self.leaveQueue(client['name'])
+		
+		i = 0
+		for currentIndex in queue.playerlist:
+			if ((len(queue.playerlist)-1) < i):
+				break				
+			if (queue.playerlist[i]['clinum'] == cli):
+				del queue.playerlist[i]
+				break;
+			i=i+1
+			
 
 
 	def leaveQueue(self, args):
 	#def leaveQueue(self, *args, **kwargs):
-		name = args
+		name = args #its fine since its no an array its the var args which is a string which contains the player name
 		params = urllib.urlencode({'command':'leaveMod','playername':name,'access_verifier':'ILoveJaredAndRoot'})
 		conn = httplib.HTTPConnection("134.169.167.11")
 		headers = {"Content-type": "application/x-www-form-urlencoded","Accept": "text/plain"}
 		conn.request("POST", "/queue.php", params, headers)
 		response = conn.getresponse()
 		#playerqueue.remove(name)
+
+		for client in queue.playerlist:
+			if (client['name'] == name):
+				client['mod'] = ''
+				
+
 
 	def joinQueue(self, args):		
 	#def joinQueue(self, *args, **kwargs):	
@@ -179,6 +222,10 @@ class queue(ConsolePlugin):
 		conn.request("POST", "/queue.php", params, headers)
 		response = conn.getresponse()
 		#playerqueue.append(name)
+
+		for client in queue.playerlist:
+			if (client['name'] == name):
+				client['mod'] = mod
 
 	def joinMod(self, args):		
 	#def joinMod(self, *args, **kwargs):
@@ -236,7 +283,8 @@ class queue(ConsolePlugin):
 					 'level' : 0,\
 					 'admin' : False,\
 					 'value' : 0,\
-					 'commander' : False})
+					 'commander' : False,\
+					 'mod' : "" })
 	
 
 	def onSetName(self, *args, **kwargs):
